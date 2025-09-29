@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diagnóstico - Gestor Recetas</title>
+  <style>
+    body { font-family: sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+    h1 { color: #FF5252; }
+    .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .item { margin-bottom: 10px; padding: 10px; border: 1px solid #eee; border-radius: 4px; }
+    .success { color: green; }
+    .error { color: red; }
+    button { background: #FF5252; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
+    img { max-width: 100px; height: auto; display: block; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Diagnóstico de Gestor Recetas</h1>
+    
+    <div class="item">
+      <h3>Prueba de caché</h3>
+      <div id="cache-test"></div>
+      <button onclick="clearCache()">Limpiar caché</button>
+    </div>
+    
+    <div class="item">
+      <h3>Prueba de Service Worker</h3>
+      <div id="sw-test"></div>
+      <button onclick="unregisterSW()">Desregistrar Service Worker</button>
+    </div>
+    
+    <div class="item">
+      <h3>Verificación de iconos</h3>
+      <div>
+        <p>icon.png (192x192):</p>
+        <img src="icon.png" alt="Icon" onerror="this.parentNode.innerHTML += '<p class=\'error\'>¡Error al cargar icon.png!</p>'">
+      </div>
+      <div>
+        <p>icon-512.png (512x512):</p>
+        <img src="icon-512.png" alt="Icon 512" onerror="this.parentNode.innerHTML += '<p class=\'error\'>¡Error al cargar icon-512.png!</p>'">
+      </div>
+    </div>
+    
+    <div class="item">
+      <h3>Estado del manifest.json</h3>
+      <div id="manifest-test"></div>
+    </div>
+    
+    <div class="item">
+      <h3>Información del sistema</h3>
+      <div id="system-info"></div>
+    </div>
+    
+    <div style="margin-top: 20px;">
+      <button onclick="window.location.href='index.html'">Volver a la aplicación</button>
+      <button onclick="forceReload()">Recargar todo</button>
+    </div>
+  </div>
+  
+  <script>
+    // Comprobar Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        const swTest = document.getElementById('sw-test');
+        if (registrations.length > 0) {
+          let html = '<p class="success">Service Worker está registrado</p>';
+          registrations.forEach(reg => {
+            html += `<p>Scope: ${reg.scope}</p>`;
+            html += `<p>Estado de actualización: ${reg.updateViaCache}</p>`;
+          });
+          swTest.innerHTML = html;
+        } else {
+          swTest.innerHTML = '<p class="error">No hay Service Workers registrados</p>';
+        }
+      });
+    } else {
+      document.getElementById('sw-test').innerHTML = '<p class="error">Service Worker no compatible</p>';
+    }
+    
+    // Comprobar caché
+    if ('caches' in window) {
+      caches.keys().then(function(cacheNames) {
+        const cacheTest = document.getElementById('cache-test');
+        if (cacheNames.length > 0) {
+          let html = '<p class="success">Cachés encontradas:</p><ul>';
+          cacheNames.forEach(name => {
+            html += `<li>${name}</li>`;
+          });
+          html += '</ul>';
+          cacheTest.innerHTML = html;
+        } else {
+          cacheTest.innerHTML = '<p>No hay cachés almacenadas</p>';
+        }
+      });
+    } else {
+      document.getElementById('cache-test').innerHTML = '<p class="error">API Cache no compatible</p>';
+    }
+    
+    // Comprobar manifest
+    fetch('manifest.json')
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error('No se pudo cargar el manifest');
+      })
+      .then(data => {
+        const manifestTest = document.getElementById('manifest-test');
+        let html = '<p class="success">Manifest cargado correctamente</p>';
+        html += `<p>Nombre: ${data.name}</p>`;
+        html += `<p>Iconos: ${data.icons ? data.icons.length : 0}</p>`;
+        manifestTest.innerHTML = html;
+      })
+      .catch(error => {
+        document.getElementById('manifest-test').innerHTML = `<p class="error">${error.message}</p>`;
+      });
+    
+    // Información del sistema
+    const systemInfo = document.getElementById('system-info');
+    systemInfo.innerHTML = `
+      <p>User Agent: ${navigator.userAgent}</p>
+      <p>Fecha: ${new Date().toLocaleString()}</p>
+      <p>URL: ${window.location.href}</p>
+    `;
+    
+    // Funciones
+    function clearCache() {
+      if ('caches' in window) {
+        caches.keys().then(function(cacheNames) {
+          return Promise.all(
+            cacheNames.map(function(cacheName) {
+              return caches.delete(cacheName);
+            })
+          );
+        }).then(() => {
+          alert('Todas las cachés eliminadas');
+          window.location.reload();
+        });
+      } else {
+        alert('API Cache no compatible');
+      }
+    }
+    
+    function unregisterSW() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            registration.unregister();
+          }
+          alert('Service Worker desregistrado');
+          window.location.reload();
+        });
+      } else {
+        alert('Service Worker no compatible');
+      }
+    }
+    
+    function forceReload() {
+      window.location.reload(true);
+    }
+  </script>
+</body>
+</html>

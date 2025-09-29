@@ -1,0 +1,1 @@
+// Chart.js should be included in your HTML, not in this JS file.

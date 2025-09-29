@@ -1,0 +1,26 @@
+{
+  "name": "Recetas Chef Perú",
+  "short_name": "Recetas Perú",
+  "description": "Aplicación para gestionar recetas de cocina peruana",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F9F9F9",
+  "theme_color": "#FF5252",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["food", "lifestyle", "cooking"],
+  "screenshots": []
+}

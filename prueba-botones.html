@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prueba de Botones</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      margin: 10px 0;
+      border-radius: 4px;
+      cursor: pointer;
+      display: block;
+      width: 100%;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #f0f0f0;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Prueba de Botones</h1>
+    
+    <h2>Formulario de Prueba</h2>
+    <input type="text" id="nombre" placeholder="Nombre">
+    <input type="number" id="cantidad" placeholder="Cantidad">
+    <select id="unidad">
+      <option value="g">gramos</option>
+      <option value="kg">kilogramos</option>
+      <option value="ml">mililitros</option>
+      <option value="l">litros</option>
+    </select>
+    <input type="number" id="precio" placeholder="Precio">
+    
+    <button id="botonAgregar">Agregar Elemento</button>
+    <button id="botonLimpiar">Limpiar Campos</button>
+    
+    <div class="result">
+      <h3>Resultado:</h3>
+      <div id="resultado">Ningún elemento agregado aún</div>
+    </div>
+    
+    <div id="listaElementos"></div>
+    
+    <h2>Otras Acciones</h2>
+    <button id="botonMostrar">Mostrar LocalStorage</button>
+    <button id="botonBorrar">Borrar LocalStorage</button>
+    <button id="botonVolver">Volver a la aplicación principal</button>
+  </div>
+
+  <script>
+    // Función para agregar un nuevo elemento
+    document.getElementById('botonAgregar').addEventListener('click', function() {
+      const nombre = document.getElementById('nombre').value;
+      const cantidad = document.getElementById('cantidad').value;
+      const unidad = document.getElementById('unidad').value;
+      const precio = document.getElementById('precio').value;
+      
+      if (nombre && cantidad && precio) {
+        const elemento = {
+          id: Date.now(),
+          nombre,
+          cantidad,
+          unidad,
+          precio
+        };
+        
+        // Guardar en localStorage
+        const elementos = JSON.parse(localStorage.getItem('elementos') || '[]');
+        elementos.push(elemento);
+        localStorage.setItem('elementos', JSON.stringify(elementos));
+        
+        // Mostrar en pantalla
+        document.getElementById('resultado').textContent = 
+          `Agregado: ${nombre} - ${cantidad} ${unidad} - Precio: S/${precio}`;
+        
+        // Agregar a la lista
+        actualizarLista();
+        
+        // Limpiar campos
+        document.getElementById('nombre').value = '';
+        document.getElementById('cantidad').value = '';
+        document.getElementById('precio').value = '';
+      } else {
+        alert('Por favor completa todos los campos');
+      }
+    });
+    
+    // Función para limpiar los campos
+    document.getElementById('botonLimpiar').addEventListener('click', function() {
+      document.getElementById('nombre').value = '';
+      document.getElementById('cantidad').value = '';
+      document.getElementById('precio').value = '';
+      document.getElementById('resultado').textContent = 'Campos limpiados';
+    });
+    
+    // Función para mostrar elementos de localStorage
+    document.getElementById('botonMostrar').addEventListener('click', function() {
+      const elementos = JSON.parse(localStorage.getItem('elementos') || '[]');
+      if (elementos.length > 0) {
+        document.getElementById('resultado').textContent = 
+          `Hay ${elementos.length} elemento(s) guardados en localStorage`;
+      } else {
+        document.getElementById('resultado').textContent = 'No hay elementos en localStorage';
+      }
+      actualizarLista();
+    });
+    
+    // Función para borrar localStorage
+    document.getElementById('botonBorrar').addEventListener('click', function() {
+      if (confirm('¿Estás seguro de que quieres borrar todos los elementos?')) {
+        localStorage.removeItem('elementos');
+        document.getElementById('resultado').textContent = 'LocalStorage borrado';
+        actualizarLista();
+      }
+    });
+    
+    // Función para actualizar la lista
+    function actualizarLista() {
+      const elementos = JSON.parse(localStorage.getItem('elementos') || '[]');
+      const listaElementos = document.getElementById('listaElementos');
+      listaElementos.innerHTML = '';
+      
+      if (elementos.length === 0) {
+        listaElementos.innerHTML = '<p>No hay elementos guardados</p>';
+        return;
+      }
+      
+      const ul = document.createElement('ul');
+      elementos.forEach(elemento => {
+        const li = document.createElement('li');
+        li.textContent = `${elemento.nombre} - ${elemento.cantidad} ${elemento.unidad} - S/${elemento.precio}`;
+        
+        const botonEliminar = document.createElement('button');
+        botonEliminar.textContent = 'Eliminar';
+        botonEliminar.style.width = 'auto';
+        botonEliminar.style.padding = '2px 8px';
+        botonEliminar.style.marginLeft = '10px';
+        botonEliminar.addEventListener('click', function() {
+          eliminarElemento(elemento.id);
+        });
+        
+        li.appendChild(botonEliminar);
+        ul.appendChild(li);
+      });
+      
+      listaElementos.appendChild(ul);
+    }
+    
+    // Función para eliminar un elemento
+    function eliminarElemento(id) {
+      let elementos = JSON.parse(localStorage.getItem('elementos') || '[]');
+      elementos = elementos.filter(elemento => elemento.id !== id);
+      localStorage.setItem('elementos', JSON.stringify(elementos));
+      actualizarLista();
+      document.getElementById('resultado').textContent = 'Elemento eliminado';
+    }
+    
+    // Botón para volver
+    document.getElementById('botonVolver').addEventListener('click', function() {
+      window.location.href = 'index.html';
+    });
+    
+    // Cargar la lista al inicio
+    document.addEventListener('DOMContentLoaded', function() {
+      actualizarLista();
+    });
+    
+    // Mostrar un mensaje al cargar la página
+    document.getElementById('resultado').textContent = 'Página cargada correctamente. Todos los botones deberían funcionar.';
+  </script>
+</body>
+</html>

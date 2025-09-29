@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Prueba de Gráfico Alternativa</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+  <script src="./breakeven-alt.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .chart-container {
+      width: 80%;
+      height: 400px;
+      margin: 20px auto;
+      border: 1px solid #ddd;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .inputs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+    }
+    label {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    input {
+      padding: 8px;
+      width: 150px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 24px;
+    }
+    .status {
+      text-align: center;
+      margin: 10px 0;
+      padding: 10px;
+      font-weight: bold;
+    }
+    .success {
+      color: #4CAF50;
+    }
+    .error {
+      color: #F44336;
+    }
+  </style>
+</head>
+<body>
+  <h1>Prueba de Gráfico de Punto de Equilibrio (Alternativa)</h1>
+  
+  <div class="inputs">
+    <div class="input-group">
+      <label for="costos-fijos">Costos Fijos (S/)</label>
+      <input type="number" id="costos-fijos" value="500" step="50">
+    </div>
+    
+    <div class="input-group">
+      <label for="costo-variable">Costo Variable Unitario (S/)</label>
+      <input type="number" id="costo-variable" value="5" step="0.5">
+    </div>
+    
+    <div class="input-group">
+      <label for="precio-venta">Precio de Venta (S/)</label>
+      <input type="number" id="precio-venta" value="7" step="0.5">
+    </div>
+    
+    <div class="input-group">
+      <label for="unidades-equilibrio">Punto de Equilibrio (calculado)</label>
+      <input type="text" id="unidades-equilibrio" value="250" readonly>
+    </div>
+  </div>
+  
+  <div style="text-align: center">
+    <button id="generar-grafico">Generar Gráfico</button>
+  </div>
+
+  <div id="status-message" class="status"></div>
+  
+  <div id="chart-container" class="chart-container">
+    <canvas id="break-even-chart"></canvas>
+  </div>
+  
+  <script>
+    document.getElementById('generar-grafico').addEventListener('click', function() {
+      const statusMessage = document.getElementById('status-message');
+      statusMessage.innerHTML = 'Generando gráfico...';
+      statusMessage.className = 'status';
+      
+      const costosFijos = parseFloat(document.getElementById('costos-fijos').value) || 0;
+      const costoVariableUnitario = parseFloat(document.getElementById('costo-variable').value) || 0;
+      const precioVenta = parseFloat(document.getElementById('precio-venta').value) || 0;
+      
+      if (costosFijos <= 0 || costoVariableUnitario <= 0 || precioVenta <= costoVariableUnitario) {
+        statusMessage.innerHTML = 'Verifica los valores: los costos fijos y el precio de venta deben ser mayores que cero, y el precio de venta debe ser mayor al costo variable unitario.';
+        statusMessage.className = 'status error';
+        return;
+      }
+      
+      const unidadesEquilibrio = Math.ceil(costosFijos / (precioVenta - costoVariableUnitario));
+      document.getElementById('unidades-equilibrio').value = unidadesEquilibrio;
+      
+      const success = generarGraficoAlternativo(costosFijos, costoVariableUnitario, precioVenta, unidadesEquilibrio);
+      
+      if (success) {
+        statusMessage.innerHTML = 'Gráfico generado correctamente';
+        statusMessage.className = 'status success';
+      } else {
+        statusMessage.innerHTML = 'Error al generar el gráfico';
+        statusMessage.className = 'status error';
+      }
+    });
+    
+    // Generar gráfico inicial
+    window.onload = function() {
+      const costosFijos = 500;
+      const costoVariableUnitario = 5;
+      const precioVenta = 7;
+      const unidadesEquilibrio = Math.ceil(costosFijos / (precioVenta - costoVariableUnitario));
+      document.getElementById('unidades-equilibrio').value = unidadesEquilibrio;
+      
+      setTimeout(() => {
+        generarGraficoAlternativo(costosFijos, costoVariableUnitario, precioVenta, unidadesEquilibrio);
+        document.getElementById('status-message').innerHTML = 'Gráfico inicial generado';
+        document.getElementById('status-message').className = 'status success';
+      }, 500);
+    };
+  </script>
+</body>
+</html>

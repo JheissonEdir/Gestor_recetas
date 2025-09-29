@@ -1,0 +1,2430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#FF5252">
+  <meta http-equiv="Content-Language" content="es">
+  <meta name="language" content="Spanish">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Recetas Chef Perú</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="./print.css" media="print">
+  <style>
+    /* Estilos para la sección de impresión */
+    .print-controls {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    #print-content-wrapper {
+      border: 1px solid #e0e0e0;
+      padding: 24px;
+      background-color: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      max-width: 800px;
+      margin: 0 auto;
+      width: 100%;
+      overflow-x: auto;
+    }
+    @media (max-width: 900px) {
+      #print-content-wrapper {
+        max-width: 100vw;
+        padding: 8px;
+      }
+      #print-content {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+      }
+    }
+    #print-content h1 {
+      color: var(--primary-color);
+      font-size: 28px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    #print-content h2 {
+      color: var(--primary-color);
+      font-size: 22px;
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 8px;
+      margin-top: 24px;
+      margin-bottom: 16px;
+    }
+    #print-content .meta-info {
+      text-align: center;
+      font-style: italic;
+      color: #666;
+      margin-bottom: 24px;
+    }
+    #print-content ul, #print-content ol {
+      padding-left: 20px;
+    }
+    #print-content li {
+      margin-bottom: 8px;
+    }
+    #print-content .photo-section {
+      margin-top: 24px;
+    }
+    #print-content .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    #print-content .photo-item img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    #print-content .photo-item p {
+      font-size: 14px;
+      color: #333;
+      margin-top: 8px;
+    }
+    #print-content .logbook-entry {
+      border-left: 4px solid var(--accent-color);
+      padding-left: 16px;
+      margin-bottom: 16px;
+      background-color: #f9f9f9;
+      padding: 12px;
+      border-radius: 4px;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+  <script src="./breakeven-chart.js" defer></script>
+  <script>
+    // Forzar idioma español
+    if (document.documentElement.lang !== 'es') {
+      document.documentElement.lang = 'es';
+    }
+    
+    // Hacer que la aplicación sea más robusta frente a diferentes tipos de recarga
+    window.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM completamente cargado y parseado');
+      // Asegurar que el idioma es español
+      document.documentElement.lang = 'es';
+    });
+  </script>
+  <style>
+    /* Corrección para textos en inglés */
+    .nav-tab[data-tab="ingredients"] .material-icons::after {
+      content: "Ingredientes";
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+    .nav-tab[data-tab="preparation"] .material-icons::after {
+      content: "Preparación";
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+    .nav-tab[data-tab="photos"] .material-icons::after {
+      content: "Fotos";
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+    .nav-tab[data-tab="logbook"] .material-icons::after {
+      content: "Bitácora";
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+    .nav-tab[data-tab="result"] .material-icons::after {
+      content: "Resultado";
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+    .nav-tab[data-tab="print"] .material-icons::after {
+      content: "Imprimir";
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+    
+    /* Variables */
+    :root {
+      --primary-color: #FF5252;
+      --primary-dark: #C50E29;
+      --primary-light: #FF867F;
+      --secondary-color: #4CAF50;
+      --background-color: #F9F9F9;
+      --surface-color: #FFFFFF;
+      --text-color: #333333;
+      --text-secondary: #757575;
+      --border-radius: 12px;
+      --shadow: 0 4px 6px rgba(0,0,0,0.1);
+      --transition: all 0.3s ease;
+    }
+    
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+    
+    /* Animaciones */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes scaleIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    
+    /* Header */
+    .app-header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 16px 20px;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .app-title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .app-title .material-icons {
+      font-size: 28px;
+    }
+    
+    .recipe-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: var(--transition);
+    }
+    
+    .recipe-input:focus {
+      outline: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    /* Contenedor principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 16px;
+      padding-bottom: 80px; /* Espacio para el menú inferior */
+    }
+    
+    /* Tarjetas */
+    .card {
+      background-color: var(--surface-color);
+      border-radius: var(--border-radius);
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      color: var(--primary-color);
+      font-weight: 600;
+      font-size: 20px;
+    }
+    
+    /* Formularios */
+    .form-group {
+      margin-bottom: 16px;
+    }
+    
+    .input-label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    
+    .text-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #e0e0e0;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      font-family: 'Poppins', sans-serif;
+      transition: var(--transition);
+    }
+    
+    .text-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(255,82,82,0.2);
+    }
+    
+    .protected-input {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23FF5252' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'%3E%3C/path%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: calc(100% - 10px) 10px;
+      background-size: 18px;
+      padding-right: 36px;
+      border-left: 3px solid #FF5252;
+    }
+    
+    .input-row {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .input-row > * {
+      flex: 1;
+    }
+    
+    select.text-input {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23757575' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
+      padding-right: 36px;
+      appearance: none;
+    }
+    
+    /* Botones */
+    .btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      font-weight: 500;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      box-shadow: 0 4px 8px rgba(197,14,41,0.3);
+    }
+    
+    .btn-primary:active {
+      transform: translateY(1px);
+    }
+    
+    .btn-secondary {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+    
+    .btn-block {
+      width: 100%;
+    }
+    
+    .btn-icon {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+    
+    .btn-icon:hover {
+      background-color: rgba(0,0,0,0.05);
+      color: var(--primary-color);
+    }
+    
+    /* Pestañas de navegación inferior */
+    .nav-tabs {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      background-color: var(--surface-color);
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      z-index: 10;
+    }
+    
+    .nav-tab {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 8px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+      font-size: 12px;
+    }
+    
+    .nav-tab .material-icons {
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+    
+    .nav-tab.active {
+      color: var(--primary-color);
+    }
+    
+    /* Contenido de pestañas */
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    /* Listas */
+    .list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .list-item {
+      padding: 16px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .list-item:last-child {
+      border-bottom: none;
+    }
+    
+    .list-item-content {
+      flex: 1;
+    }
+    
+    .list-item-title {
+      font-weight: 500;
+      margin: 0;
+    }
+    
+    .list-item-subtitle {
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin: 4px 0 0;
+    }
+    
+    .list-item-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .badge-price {
+      background-color: rgba(76, 175, 80, 0.15);
+      color: #2e7d32;
+    }
+    
+    /* Grillas de fotos */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+    
+    .photo-item {
+      overflow: hidden;
+      border-radius: var(--border-radius);
+      background-color: #f0f0f0;
+      position: relative;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .photo-category-section {
+      margin-bottom: 24px;
+    }
+    
+    .photo-gallery {
+      width: 100%;
+    }
+    
+    .photo-metadata {
+      background-color: #f5f5f5;
+      padding: 8px;
+      border-top: 1px solid #e0e0e0;
+      font-size: 11px;
+    }
+    
+    .photo-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: var(--transition);
+    }
+    
+    .photo-item:hover img {
+      transform: scale(1.05);
+    }
+    
+    .photo-number {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      z-index: 1;
+    }
+    
+    .photo-category-section {
+      margin-bottom: 16px;
+    }
+    
+    .photo-gallery {
+      width: 100%;
+    }
+    
+    .photo-metadata {
+      background-color: #f5f5f5;
+      padding: 8px;
+      border-top: 1px solid #e0e0e0;
+      font-size: 11px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .photo-info {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 8px;
+      font-size: 10px;
+      transition: var(--transition);
+      transform: translateY(100%);
+    }
+    
+    .photo-item:hover .photo-info {
+      transform: translateY(0);
+    }
+    
+    .photo-date {
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+    
+    .photo-location {
+      font-size: 9px;
+      opacity: 0.9;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    /* Diseño específico para entrada de archivo */
+    .file-input-wrapper {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+      width: 100%;
+    }
+    
+    .file-input-wrapper input[type="file"] {
+      opacity: 0;
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+    
+    .file-input-button {
+      background-color: #f0f0f0;
+      color: var(--text-secondary);
+      border: 2px dashed #ccc;
+      border-radius: var(--border-radius);
+      padding: 16px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: var(--transition);
+    }
+    
+    .file-input-button:hover {
+      background-color: #e8e8e8;
+      border-color: var(--primary-color);
+    }
+    
+    /* Tarjeta de resumen */
+    .summary-card {
+      border-left: 4px solid var(--primary-color);
+      padding-left: 16px;
+    }
+    
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    
+    .summary-label {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    
+    .summary-value {
+      font-weight: 600;
+    }
+    
+    .summary-value.highlight {
+      color: var(--primary-color);
+      font-size: 18px;
+    }
+    
+    /* Media queries para diferentes tamaños de pantalla */
+    @media (min-width: 768px) {
+      .app-header {
+        padding: 20px 24px;
+      }
+      
+      .header-content {
+        flex-direction: row;
+        justify-content: space-between;
+      }
+      
+      .app-title {
+        margin-right: 24px;
+      }
+      
+      .recipe-input {
+        max-width: 400px;
+      }
+      
+      .nav-tabs {
+        position: static;
+        margin-bottom: 24px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+      }
+      
+      .container {
+        padding: 24px;
+        padding-bottom: 24px;
+      }
+      
+      .photo-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-content">
+      <h1 class="app-title">
+        <span class="material-icons">restaurant</span>
+        Recetas Chef Perú
+      </h1>
+      <input type="text" class="recipe-input" id="recipe-title" placeholder="Nombre de la receta...">
+    </div>
+    <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+      <button id="reset-all-header" class="btn" style="background-color: #F44336; color: white; padding: 8px 12px; font-size: 14px;">
+        <span class="material-icons" style="font-size: 16px;">delete_forever</span>
+        Borrar Todo
+      </button>
+    </div>
+  </header>
+  
+  <!-- Contenedor principal -->
+  <div class="container">
+    <!-- Contenido de la pestaña Ingredientes -->
+    <div class="tab-content active" id="ingredients-tab">
+      <div class="card">
+        <h2>Ingredientes</h2>
+        
+        <div class="form-group">
+          <label class="input-label" for="ingredient-name">Nombre del ingrediente</label>
+          <input type="text" class="text-input" id="ingredient-name" placeholder="Ej: Harina de trigo">
+        </div>
+        
+        <div class="form-group">
+          <div class="input-row">
+            <div>
+              <label class="input-label" for="ingredient-quantity">Cantidad</label>
+              <input type="number" class="text-input" id="ingredient-quantity" placeholder="Ej: 500">
+            </div>
+            <div>
+              <label class="input-label" for="ingredient-unit">Unidad</label>
+              <select class="text-input" id="ingredient-unit">
+                <option value="g">gramos (g)</option>
+                <option value="kg">kilogramos (kg)</option>
+                <option value="ml">mililitros (ml)</option>
+                <option value="l">litros (l)</option>
+                <option value="unidad">unidad(es)</option>
+                <option value="cucharada">cucharada(s)</option>
+                <option value="taza">taza(s)</option>
+                <option value="pizca">pizca(s)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="input-label" for="ingredient-price">Precio unitario (S/)</label>
+          <input type="number" class="text-input" id="ingredient-price" placeholder="Ej: 25.50">
+        </div>
+        <div class="form-group">
+          <div style="display: flex; align-items: center; justify-content: space-between; background-color: #f8f9fa; padding: 10px; border-radius: 8px;">
+            <span id="price-calculation-label" style="color: var(--text-secondary);">Costo total: -</span>
+            <button type="button" class="btn-icon" id="refresh-price" style="color: #1976D2; background-color: #e3f2fd; padding: 8px; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+              <span class="material-icons" style="font-size: 20px;">refresh</span>
+            </button>
+          </div>
+        </div>
+        
+        <button class="btn btn-primary btn-block" id="add-ingredient">
+          <span class="material-icons">add</span>
+          Agregar Ingrediente
+        </button>
+        
+        <div style="margin-top: 24px;">
+          <h3 style="color: var(--text-secondary); font-size: 16px; font-weight: 500;">Lista de ingredientes</h3>
+          <div class="summary-card" style="margin-bottom: 16px;">
+            <div class="summary-row">
+              <span class="summary-label">Costo total:</span>
+              <span class="summary-value" id="ingredients-total-cost">S/0.00</span>
+            </div>
+          </div>
+          <ul class="list" id="ingredients-list">
+            <!-- Los ingredientes se agregarán aquí mediante JavaScript -->
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Contenido de la pestaña Preparación -->
+    <div class="tab-content" id="preparation-tab">
+      <div class="card">
+        <h2>Preparación</h2>
+        
+        <div class="form-group">
+          <label class="input-label" for="preparation-step">Describe el paso</label>
+          <textarea class="text-input protected-input" id="preparation-step" rows="3" 
+            placeholder="Ej: Mezclar la harina con la levadura..." 
+            onpaste="showToast('No se permite pegar texto en la preparación', 'error'); return false;" 
+            oncopy="showToast('No se permite copiar texto de la preparación', 'error'); return false;"
+            oncontextmenu="showToast('No se permite copiar/pegar en esta área', 'error'); return false;"></textarea>
+          <div class="input-hint" style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+            <span class="material-icons" style="font-size: 14px; vertical-align: middle;">info</span>
+            No se permite copiar ni pegar texto en la preparación
+          </div>
+        </div>
+        
+        <button class="btn btn-primary btn-block" id="add-step">
+          <span class="material-icons">playlist_add</span>
+          Agregar Paso
+        </button>
+        
+        <div style="margin-top: 24px;">
+          <h3 style="color: var(--text-secondary); font-size: 16px; font-weight: 500;">Pasos a seguir</h3>
+          <div class="steps-container" style="background-color: #f9f9f9; border-radius: 8px; padding: 16px;">
+            <ol class="list" id="steps-list" style="padding-left: 24px; margin-bottom: 0;">
+              <!-- Los pasos se agregarán aquí mediante JavaScript -->
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Contenido de la pestaña Fotos -->
+    <div class="tab-content" id="photos-tab">
+      <div class="card">
+        <h2>ANTES de la preparación</h2>
+        <p style="color: var(--text-secondary); margin-top: -8px; margin-bottom: 12px;">Fotos de los ingredientes antes de iniciar la preparación</p>
+        <div style="background-color: #f9f4e8; padding: 8px 12px; border-radius: 8px; margin-bottom: 12px;">
+          <span style="color: var(--primary-color); font-weight: 600;">A1, A2, A3...</span> Fotos numeradas automáticamente con fecha y ubicación
+        </div>
+        
+        <div class="file-input-wrapper">
+          <div class="file-input-button">
+            <span class="material-icons">add_photo_alternate</span>
+            <span>Seleccionar fotos de ANTES</span>
+          </div>
+          <input type="file" id="photo-before" accept="image/*" multiple>
+        </div>
+        
+        <div class="form-group" style="margin-top: 16px;">
+          <label class="input-label" for="description-before">Descripción</label>
+          <textarea class="text-input" id="description-before" rows="2" placeholder="Describe las fotos..."></textarea>
+        </div>
+        
+        <button class="btn btn-secondary" id="save-before">
+          <span class="material-icons">save</span>
+          Guardar descripción
+        </button>
+        
+        <div class="photo-grid" id="before-photos">
+          <!-- Las fotos se mostrarán aquí -->
+        </div>
+      </div>
+      
+      <div class="card">
+        <h2>DURANTE la preparación</h2>
+        <p style="color: var(--text-secondary); margin-top: -8px; margin-bottom: 12px;">Fotos del proceso de preparación en curso</p>
+        <div style="background-color: #f9f4e8; padding: 8px 12px; border-radius: 8px; margin-bottom: 12px;">
+          <span style="color: var(--primary-color); font-weight: 600;">D1, D2, D3...</span> Fotos numeradas automáticamente con fecha y ubicación
+        </div>
+        
+        <div class="file-input-wrapper">
+          <div class="file-input-button">
+            <span class="material-icons">add_photo_alternate</span>
+            <span>Seleccionar fotos de DURANTE</span>
+          </div>
+          <input type="file" id="photo-during" accept="image/*" multiple>
+        </div>
+        
+        <div class="form-group" style="margin-top: 16px;">
+          <label class="input-label" for="description-during">Descripción</label>
+          <textarea class="text-input" id="description-during" rows="2" placeholder="Describe las fotos..."></textarea>
+        </div>
+        
+        <button class="btn btn-secondary" id="save-during">
+          <span class="material-icons">save</span>
+          Guardar descripción
+        </button>
+        
+        <div class="photo-grid" id="during-photos">
+          <!-- Las fotos se mostrarán aquí -->
+        </div>
+      </div>
+      
+      <div class="card">
+        <h2>DESPUÉS de la preparación</h2>
+        <p style="color: var(--text-secondary); margin-top: -8px; margin-bottom: 12px;">Fotos del resultado final y la presentación del plato</p>
+        <div style="background-color: #f9f4e8; padding: 8px 12px; border-radius: 8px; margin-bottom: 12px;">
+          <span style="color: var(--primary-color); font-weight: 600;">P1, P2, P3...</span> Fotos numeradas automáticamente con fecha y ubicación
+        </div>
+        
+        <div class="file-input-wrapper">
+          <div class="file-input-button">
+            <span class="material-icons">add_photo_alternate</span>
+            <span>Seleccionar fotos de DESPUÉS</span>
+          </div>
+          <input type="file" id="photo-after" accept="image/*" multiple>
+        </div>
+        
+        <div class="form-group" style="margin-top: 16px;">
+          <label class="input-label" for="description-after">Descripción</label>
+          <textarea class="text-input" id="description-after" rows="2" placeholder="Describe las fotos..."></textarea>
+        </div>
+        
+        <button class="btn btn-secondary" id="save-after">
+          <span class="material-icons">save</span>
+          Guardar descripción
+        </button>
+        
+        <div class="photo-grid" id="after-photos">
+          <!-- Las fotos se mostrarán aquí -->
+        </div>
+      </div>
+    </div>
+    
+    <!-- Contenido de la pestaña Bitácora -->
+    <div class="tab-content" id="logbook-tab">
+      <div class="card">
+        <h2>Bitácora de Trabajo</h2>
+        
+        <div class="form-group">
+          <label class="input-label" for="logbook-date">Fecha</label>
+          <input type="date" class="text-input" id="logbook-date">
+        </div>
+        
+        <div class="form-group">
+          <label class="input-label" for="logbook-title">Título de la anotación</label>
+          <input type="text" class="text-input" id="logbook-title" placeholder="Ej: Problema con suministros">
+        </div>
+        
+        <div class="form-group">
+          <label class="input-label" for="logbook-category">Categoría</label>
+          <select class="text-input" id="logbook-category">
+            <option value="materiales">Materiales/Ingredientes</option>
+            <option value="equipo">Equipo de trabajo</option>
+            <option value="proceso">Proceso de preparación</option>
+            <option value="cliente">Cliente/Requisitos</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="input-label" for="logbook-text">Descripción</label>
+          <textarea class="text-input" id="logbook-text" rows="4" placeholder="Describe detalladamente lo sucedido..."></textarea>
+        </div>
+        
+        <button class="btn btn-primary btn-block" id="add-logbook-entry">
+          <span class="material-icons">add</span>
+          Agregar Anotación
+        </button>
+        
+        <div style="margin-top: 24px;">
+          <h3 style="color: var(--text-secondary); font-size: 16px; font-weight: 500;">Anotaciones</h3>
+          <ul class="list" id="logbook-entries-list">
+            <!-- Las anotaciones se agregarán aquí mediante JavaScript -->
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Contenido de la pestaña Resultado -->
+    <div class="tab-content" id="result-tab">
+      <div class="card">
+        <h2>Resultado Final</h2>
+        
+        <div id="author-info" style="background-color: #f8f9fa; padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+          <h3 style="color: var(--primary-color); font-size: 18px; margin-top: 0;">Información del Chef</h3>
+          <div class="form-group">
+            <label class="input-label" for="chef-name">Nombre del Chef</label>
+            <input type="text" class="text-input" id="chef-name" placeholder="Ingrese su nombre">
+          </div>
+        </div>
+        
+        <div class="summary-card">
+          <div class="summary-row" style="background-color: var(--primary-color); color: white; border-radius: 8px 8px 0 0; padding: 12px 16px;">
+            <span style="font-size: 18px; font-weight: 600;">Resumen de la Receta</span>
+          </div>
+          
+          <div class="summary-row">
+            <span class="summary-label">Título:</span>
+            <span class="summary-value" id="summary-title">-</span>
+          </div>
+          
+          <div class="summary-row">
+            <span class="summary-label">Chef:</span>
+            <span class="summary-value" id="summary-chef">-</span>
+          </div>
+          
+          <div class="summary-row">
+            <span class="summary-label">Total de ingredientes:</span>
+            <span class="summary-value" id="summary-ingredients">0</span>
+          </div>
+          
+          <div class="summary-row">
+            <span class="summary-label">Pasos de preparación:</span>
+            <span class="summary-value" id="summary-steps">0</span>
+          </div>
+          
+          <div class="summary-row">
+            <span class="summary-label">Fotos agregadas:</span>
+            <span class="summary-value" id="summary-photos">0</span>
+          </div>
+          
+          <div class="summary-row">
+            <span class="summary-label">Fecha de creación:</span>
+            <span class="summary-value" id="summary-date">26/09/2025</span>
+          </div>
+          
+          <div class="summary-row">
+            <span class="summary-label">Costo total:</span>
+            <span class="summary-value" id="summary-cost">S/0.00</span>
+          </div>
+          
+          <div class="summary-row">
+            <span class="summary-label">Precio sugerido (30% margen):</span>
+            <span class="summary-value highlight" id="suggested-price">S/0.00</span>
+          </div>
+        </div>
+
+        <!-- Visor de fotos de evidencia -->
+        <div style="margin-top: 24px;">
+          <h3 style="color: var(--primary-color); font-size: 18px; font-weight: 600;">Fotos de Evidencia</h3>
+          
+          <div class="photos-container" style="border: 1px solid #eee; border-radius: 8px; overflow: hidden; padding: 16px;">
+            <div class="photo-category-section">
+              <h4 style="color: var(--primary-color); font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">ANTES</h4>
+              <div class="photo-gallery" id="summary-before-photos" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px;">
+                <!-- Fotos ANTES -->
+              </div>
+            </div>
+            
+            <div class="photo-category-section" style="margin-top: 24px;">
+              <h4 style="color: var(--primary-color); font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">DURANTE</h4>
+              <div class="photo-gallery" id="summary-during-photos" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px;">
+                <!-- Fotos DURANTE -->
+              </div>
+            </div>
+            
+            <div class="photo-category-section" style="margin-top: 24px;">
+              <h4 style="color: var(--primary-color); font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">DESPUÉS</h4>
+              <div class="photo-gallery" id="summary-after-photos" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px;">
+                <!-- Fotos DESPUÉS -->
+              </div>
+            </div>
+          </div>
+          </div>
+        </div>
+        
+        <div style="margin-top: 24px;">
+          <h3 style="color: var(--primary-color); font-size: 18px; font-weight: 600;">Punto de Equilibrio</h3>
+          
+          <div class="alert" style="background-color: #FFF8E1; border-left: 4px solid #FFC107; padding: 12px; margin-bottom: 16px; border-radius: 4px;">
+            <p><strong>¿Qué es el punto de equilibrio?</strong></p>
+            <p style="margin-top: 8px;">El punto de equilibrio es el nivel de ventas donde los ingresos totales son iguales a los costos totales, es decir, el punto donde no hay ganancias ni pérdidas.</p>
+            <p style="margin-top: 8px;"><strong>Fórmula:</strong> Punto de Equilibrio = Costos Fijos / (Precio de Venta - Costo Variable Unitario)</p>
+            <p style="margin-top: 5px;"><strong>Ejemplo:</strong> Si tus costos fijos son S/500, el precio de venta es S/7 y el costo variable unitario es S/5, el punto de equilibrio sería 250 unidades. Esto significa que a partir de la unidad 251 empezarías a generar ganancias.</p>
+          </div>
+          
+          <div class="form-group">
+            <label class="input-label" for="costos-fijos">Costos fijos (S/)</label>
+            <input type="number" step="0.01" class="text-input" id="costos-fijos" placeholder="Ej: alquiler, servicios, etc.">
+            <small style="display: block; color: #666; margin-top: 4px;">Son los costos que no cambian con la cantidad producida (alquiler, salarios fijos, servicios básicos)</small>
+          </div>
+          
+          <div class="form-group">
+            <label class="input-label" for="costo-unitario-extra">Costo unitario extra (S/)</label>
+            <input type="number" step="0.01" class="text-input" id="costo-unitario-extra" placeholder="Costos adicionales por unidad">
+            <small style="display: block; color: #666; margin-top: 4px;">Costos variables por unidad adicionales a los ingredientes (envases, etiquetas, delivery)</small>
+          </div>
+          
+          <div class="form-group">
+            <label class="input-label" for="precio-venta">Precio de venta (S/)</label>
+            <input type="number" step="0.01" class="text-input" id="precio-venta">
+            <small style="display: block; color: #666; margin-top: 4px;">El precio al que venderás cada unidad de tu producto</small>
+          </div>
+
+          <div class="form-group">
+            <label class="input-label" for="cantidad-producida">Cantidad a producir (unidades)</label>
+            <input type="number" step="1" class="text-input" id="cantidad-producida" placeholder="Ej: 100">
+            <small style="display: block; color: #666; margin-top: 4px;">Número de unidades que planeas producir y vender</small>
+          </div>
+          
+          <button class="btn btn-secondary" id="calcular-equilibrio">
+            <span class="material-icons">calculate</span>
+            Calcular Punto de Equilibrio
+          </button>
+          
+          <div class="summary-card" style="margin-top: 16px;">
+            <div class="summary-row">
+              <span class="summary-label">Punto de equilibrio (unidades):</span>
+              <span class="summary-value" id="punto-equilibrio-unidades">0</span>
+            </div>
+            
+            <div class="summary-row">
+              <span class="summary-label">Ingresos en punto de equilibrio:</span>
+              <span class="summary-value" id="punto-equilibrio-ingresos">S/0.00</span>
+            </div>
+            
+            <div class="summary-row" style="background-color: #f5f5f5; padding: 8px;">
+              <span class="summary-label">Interpretación:</span>
+              <span class="summary-value" style="font-weight: normal; font-size: 13px;">A partir de la unidad siguiente al punto de equilibrio comenzarás a generar ganancias</span>
+            </div>
+          </div>
+          
+          <div style="margin-top: 24px;">
+            <h4 style="color: var(--text-secondary); font-size: 16px; margin-bottom: 12px;">Gráfica de Punto de Equilibrio</h4>
+            <div id="chart-container" class="chart-container" style="position: relative; height: 300px; border: 1px solid #eee; border-radius: 8px; padding: 16px;">
+              <canvas id="break-even-chart"></canvas>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 12px; text-align: center; margin-top: 8px;">
+              La gráfica muestra los costos fijos (línea horizontal), costos variables (línea inclinada) e ingresos (línea inclinada).
+              El punto donde se cruzan los costos totales y los ingresos es el punto de equilibrio.
+            </p>
+          </div>
+        </div>
+        
+        <!-- Botones temporalmente eliminados -->
+        <div style="margin-top: 24px;" class="botones-ocultos">
+          <!-- Los botones de Generar PDF, Compartir Receta y BORRAR TODO fueron eliminados por solicitud del usuario -->
+        </div>
+      </div>
+    </div>
+    <!-- Contenido de la pestaña Imprimir -->
+    <div class="tab-content" id="print-tab">
+      <div class="card">
+        <h2>Resumen para Imprimir</h2>
+        <p>Aquí tienes una vista previa de cómo se verá tu receta. Usa el botón de abajo para imprimir o guardar como PDF.</p>
+        
+        <div class="print-controls">
+          <button id="prepare-print-btn" class="btn btn-secondary">
+            <span class="material-icons">refresh</span> Actualizar Vista Previa
+          </button>
+          <button id="print-btn" class="btn">
+            <span class="material-icons">print</span> Imprimir Receta
+          </button>
+        </div>
+
+        <div id="print-content-wrapper">
+          <div id="print-content">
+            <!-- El contenido de la receta se generará aquí -->
+            <p style="text-align:center; color:var(--text-secondary); padding:32px;">
+              Haz clic en "Actualizar Vista Previa" para generar el resumen de tu receta.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  
+
+  <!-- Navegación de pestañas en la parte inferior -->
+  <nav class="nav-tabs">
+    <div class="nav-tab active" data-tab="ingredients">
+      <span class="material-icons">shopping_cart</span>
+      Ingredientes
+    </div>
+    <div class="nav-tab" data-tab="preparation">
+      <span class="material-icons">format_list_numbered</span>
+      Preparación
+    </div>
+    <div class="nav-tab" data-tab="photos">
+      <span class="material-icons">photo_camera</span>
+      Fotos
+    </div>
+    <div class="nav-tab" data-tab="logbook">
+      <span class="material-icons">book</span>
+      Bitácora
+    </div>
+    <div class="nav-tab" data-tab="result">
+      <span class="material-icons">assessment</span>
+      Resultado
+    </div>
+    <div class="nav-tab" data-tab="print">
+      <span class="material-icons">print</span>
+      Imprimir
+    </div>
+  </nav>
+<!-- Footer con información de copyright -->
+  <footer style="text-align: center; padding: 20px; background-color: #333; color: white; font-size: 12px; margin-bottom: 60px;">
+    Desarrollado por MAxSystem<br>
+    Contacto: edir77@gmail.com | WhatsApp: +51 925 679 932<br>
+    Todos los derechos reservados &copy; 2025
+  </footer>
+  
+  <script>
+    // Función para corregir textos de la barra de navegación
+    function corregirTextosNavegacion() {
+      const traducciones = {
+        'shopping_cart': 'Ingredientes',
+        'format_list_numbered': 'Preparación',
+        'photo_camera': 'Fotos',
+        'book': 'Bitácora',
+        'assessment': 'Resultado',
+        'print': 'Imprimir'
+      };
+      
+      const navTabs = document.querySelectorAll('.nav-tab');
+      navTabs.forEach(tab => {
+        const icon = tab.querySelector('.material-icons');
+        if (icon) {
+          const iconText = icon.textContent.trim();
+          
+          // Buscar si hay un nodo de texto después del icono
+          let textNode = null;
+          tab.childNodes.forEach(node => {
+            if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+              textNode = node;
+            }
+          });
+          
+          if (textNode) {
+            // Si el texto está en inglés (es el mismo que el icono) o está vacío, reemplazarlo
+            const currentText = textNode.textContent.trim();
+            if (currentText === iconText || !currentText) {
+              if (traducciones[iconText]) {
+                textNode.textContent = " " + traducciones[iconText];
+              }
+            }
+          } else if (traducciones[iconText]) {
+            // Si no hay texto, añadirlo
+            tab.appendChild(document.createTextNode(" " + traducciones[iconText]));
+          }
+        }
+      });
+    }
+    
+    // Encapsular todo el código en DOMContentLoaded para asegurar que el DOM está completamente cargado
+    document.addEventListener('DOMContentLoaded', function() {
+      // Protección real contra copiar/pegar/contextmenu en preparación
+      const prepStep = document.getElementById('preparation-step');
+      if (prepStep) {
+        prepStep.addEventListener('cut', function(e) {
+          e.preventDefault();
+          showToast('No se permite cortar texto de la preparación', 'error');
+        });
+        prepStep.addEventListener('paste', function(e) {
+          e.preventDefault();
+          showToast('No se permite pegar texto en la preparación', 'error');
+        });
+        prepStep.addEventListener('copy', function(e) {
+          e.preventDefault();
+          showToast('No se permite copiar texto de la preparación', 'error');
+        });
+        prepStep.addEventListener('contextmenu', function(e) {
+          e.preventDefault();
+          showToast('No se permite copiar/pegar en esta área', 'error');
+        });
+      }
+      console.log('Inicializando la aplicación...');
+      
+      // Actualizar resumen y fotos del resumen
+      updateSummary();
+      updateSummaryPhotos();
+      
+      // Cargar fotos inmediatamente al iniciar la aplicación
+      setTimeout(function() {
+        console.log('Inicializando fotos...');
+        // Cargar fotos desde localStorage para cada sección
+        ['before-photos', 'during-photos', 'after-photos'].forEach(sectionId => {
+          try {
+            const photosData = localStorage.getItem(`${sectionId}-photos`); // Usar la clave correcta con -photos
+            if (photosData) {
+              const photos = JSON.parse(photosData);
+              console.log(`Fotos cargadas para ${sectionId}:`, photos.length);
+              updatePhotoContainer(sectionId, photos);
+            }
+          } catch (error) {
+            console.error(`Error al cargar fotos para ${sectionId}:`, error);
+          }
+        });
+        
+        // Actualizar las fotos en la sección de resumen después de cargar las fotos principales
+        updateSummaryPhotos();
+        
+        // Actualizar la vista de resumen de fotos
+        updateSummaryPhotos();
+      }, 500);
+      
+      // Corregir textos de navegación
+      corregirTextosNavegacion();
+    
+    // Funcionalidad de las pestañas
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Desactivar todas las pestañas
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        // Activar la pestaña seleccionada
+        tab.classList.add('active');
+        const tabId = tab.getAttribute('data-tab') + '-tab';
+        document.getElementById(tabId).classList.add('active');
+        
+        // Si es la pestaña de imprimir o resultado, actualizar la vista correspondiente
+        if (tabId === 'print-tab') {
+          updatePrintView();
+        } else if (tabId === 'result-tab') {
+          updateSummary();
+          updateSummaryPhotos();
+        }
+        
+        // Animación para el contenido
+        document.getElementById(tabId).style.animation = 'scaleIn 0.3s ease-out forwards';
+      });
+    });
+    
+    // Variables globales
+    let ingredients = [];
+    let steps = []; // Inicializar steps como variable global
+    
+    // Gestión de ingredientes
+    const addIngredientBtn = document.getElementById('add-ingredient');
+    const ingredientsList = document.getElementById('ingredients-list');
+    
+    // Verificar que los elementos existen
+    console.log('Elemento addIngredientBtn:', addIngredientBtn ? 'Encontrado' : 'NO ENCONTRADO');
+    console.log('Elemento ingredientsList:', ingredientsList ? 'Encontrado' : 'NO ENCONTRADO');
+    
+    // Recuperar ingredientes del almacenamiento local
+    const savedIngredients = localStorage.getItem('ingredients');
+    if (savedIngredients) {
+      ingredients = JSON.parse(savedIngredients);
+      updateIngredientsList();
+    }
+    
+    // Definir la función para agregar ingrediente
+    function addIngredient() {
+      console.log('Función addIngredient ejecutada');
+      const name = document.getElementById('ingredient-name').value;
+      const quantity = document.getElementById('ingredient-quantity').value;
+      const unit = document.getElementById('ingredient-unit').value;
+      const priceUnit = document.getElementById('ingredient-price').value;
+      
+      console.log('Valores del ingrediente:', { name, quantity, unit, priceUnit });
+      
+      if (name && quantity && priceUnit) {
+        const quantityVal = parseFloat(quantity);
+        const priceUnitVal = parseFloat(priceUnit);
+        // Usar máxima precisión en el cálculo
+        const totalPrice = parseFloat((quantityVal * priceUnitVal).toFixed(3));
+        
+        const ingredient = {
+          id: Date.now(), // Usar timestamp como ID único
+          name,
+          quantity: quantityVal,
+          unit,
+          priceUnit: priceUnitVal,
+          price: totalPrice
+        };
+        
+        ingredients.push(ingredient);
+        updateIngredientsList();
+        saveIngredientsToStorage();
+        
+        // Limpiar formulario
+        document.getElementById('ingredient-name').value = '';
+        document.getElementById('ingredient-quantity').value = '';
+        document.getElementById('ingredient-price').value = '';
+        
+        // Mostrar mensaje de éxito
+        showToast('Ingrediente agregado');
+      } else {
+        // Mostrar mensaje de error
+        showToast('Por favor completa todos los campos', 'error');
+      }
+    }
+    
+    // Asignar el evento click al botón
+    if (addIngredientBtn) {
+      addIngredientBtn.addEventListener('click', addIngredient);
+      console.log('Evento click asignado a addIngredientBtn');
+    }
+    
+    function updateIngredientsList() {
+      ingredientsList.innerHTML = '';
+      
+      // Calcular y mostrar el costo total
+      let totalCost = 0;
+      if (ingredients.length > 0) {
+        totalCost = ingredients.reduce((sum, item) => sum + item.price, 0);
+      }
+      document.getElementById('ingredients-total-cost').textContent = `S/${totalCost.toFixed(2)}`;
+      
+      if (ingredients.length === 0) {
+        ingredientsList.innerHTML = '<p style="text-align:center; color:var(--text-secondary); padding:16px;">No hay ingredientes agregados</p>';
+        return;
+      }
+      
+      ingredients.forEach((ingredient, index) => {
+        const li = document.createElement('li');
+        li.className = 'list-item';
+        const priceUnit = ingredient.priceUnit || (ingredient.price / ingredient.quantity);
+        
+        li.innerHTML = `
+          <div class="list-item-content">
+            <h4 class="list-item-title">${ingredient.name}</h4>
+            <p class="list-item-subtitle">
+              ${ingredient.quantity} ${ingredient.unit}
+              <span class="badge badge-price">S/${ingredient.price.toFixed(2)}</span>
+            </p>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+              ${ingredient.quantity} x ${priceUnit.toFixed(3)} = ${ingredient.price.toFixed(3)} soles
+            </p>
+          </div>
+          <div class="list-item-actions">
+            <button class="btn-icon" onclick="editIngredient(${ingredient.id})">
+              <span class="material-icons">edit</span>
+            </button>
+            <button class="btn-icon" onclick="deleteIngredient(${ingredient.id})">
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+        `;
+        ingredientsList.appendChild(li);
+      });
+      
+      // Solo actualizar el resumen si la función existe
+      if (typeof updateSummary === 'function') {
+        updateSummary();
+      }
+    }
+    
+    function saveIngredientsToStorage() {
+      localStorage.setItem('ingredients', JSON.stringify(ingredients));
+    }
+    
+    // Funciones globales para manipular ingredientes
+    window.deleteIngredient = function(id) {
+      ingredients = ingredients.filter(item => item.id !== id);
+      updateIngredientsList();
+      saveIngredientsToStorage();
+      showToast('Ingrediente eliminado');
+    };
+    
+    window.editIngredient = function(id) {
+      const ingredient = ingredients.find(item => item.id === id);
+      if (ingredient) {
+        document.getElementById('ingredient-name').value = ingredient.name;
+        document.getElementById('ingredient-quantity').value = ingredient.quantity;
+        document.getElementById('ingredient-unit').value = ingredient.unit;
+        document.getElementById('ingredient-price').value = ingredient.price;
+        
+        // Eliminar el ingrediente actual, luego se volverá a agregar al editar
+        deleteIngredient(id);
+        
+        // Scroll al formulario
+        document.getElementById('ingredient-name').scrollIntoView({behavior: 'smooth'});
+        document.getElementById('ingredient-name').focus();
+      }
+    };
+    
+    // Gestión de pasos
+    // steps ya fue inicializado como una variable global más arriba
+    const addStepButton = document.getElementById('add-step');
+    const stepsList = document.getElementById('steps-list');
+    
+    // Verificar que los elementos existen
+    console.log('Elemento addStepButton:', addStepButton ? 'Encontrado' : 'NO ENCONTRADO');
+    console.log('Elemento stepsList:', stepsList ? 'Encontrado' : 'NO ENCONTRADO');
+    
+    // Recuperar pasos del almacenamiento local
+    const savedSteps = localStorage.getItem('steps');
+    if (savedSteps) {
+      steps = JSON.parse(savedSteps);
+      if (typeof updateStepsList === 'function') {
+        updateStepsList();
+      }
+    }
+    
+    // Verificar si hay datos en localStorage cada vez que se carga la página
+    function checkLocalStorage() {
+      console.log('Verificando datos en localStorage:');
+      console.log('Ingredientes:', localStorage.getItem('ingredients') ? 'Encontrados' : 'No encontrados');
+      console.log('Pasos:', localStorage.getItem('steps') ? 'Encontrados' : 'No encontrados');
+      console.log('Fotos ANTES:', localStorage.getItem('before-photos-photos') ? 'Encontradas' : 'No encontradas');
+      console.log('Fotos DURANTE:', localStorage.getItem('during-photos-photos') ? 'Encontradas' : 'No encontradas');
+      console.log('Fotos DESPUÉS:', localStorage.getItem('after-photos-photos') ? 'Encontradas' : 'No encontradas');
+    }
+    
+    // Ejecutar verificación al cargar
+    checkLocalStorage();
+    
+    // Definir la función para agregar paso
+    function addStep() {
+      console.log('Función addStep ejecutada');
+      const stepText = document.getElementById('preparation-step').value;
+      
+      console.log('Texto del paso:', stepText);
+      
+      if (stepText) {
+        const step = {
+          id: Date.now(),
+          text: stepText
+        };
+        
+        steps.push(step);
+        updateStepsList();
+        saveStepsToStorage();
+        
+        // Limpiar formulario
+        document.getElementById('preparation-step').value = '';
+        
+        // Mostrar mensaje de éxito
+        showToast('Paso agregado');
+      } else {
+        // Mostrar mensaje de error
+        showToast('Por favor ingresa un texto para el paso', 'error');
+      }
+    }
+    
+    // Asignar el evento click al botón
+    if (addStepButton) {
+      addStepButton.addEventListener('click', addStep);
+      console.log('Evento click asignado a addStepButton');
+    }
+    
+    function updateStepsList() {
+      stepsList.innerHTML = '';
+      
+      if (steps.length === 0) {
+        stepsList.innerHTML = '<p style="text-align:center; color:var(--text-secondary); padding:16px;">No hay pasos agregados</p>';
+        return;
+      }
+      
+      steps.forEach((step, index) => {
+        const li = document.createElement('li');
+        li.className = 'step-item';
+        li.style.marginBottom = '16px';
+        li.style.paddingLeft = '10px';
+        li.innerHTML = `
+          <div class="list-item-content" style="background-color: white; padding: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <div style="margin-left: 8px; margin-right: 8px;">
+              <strong>Paso ${index + 1}:</strong> ${step.text}
+            </div>
+            <div class="list-item-actions" style="margin-top: 8px; text-align: right;">
+              <button class="btn-icon" onclick="editStep(${step.id})">
+                <span class="material-icons" style="font-size: 18px;">edit</span>
+              </button>
+              <button class="btn-icon" onclick="deleteStep(${step.id})">
+                <span class="material-icons" style="font-size: 18px;">delete</span>
+              </button>
+            </div>
+          </div>
+        `;
+        stepsList.appendChild(li);
+      });
+      
+      if (typeof updateSummary === 'function') {
+        updateSummary();
+      }
+    }
+    
+    function saveStepsToStorage() {
+      localStorage.setItem('steps', JSON.stringify(steps));
+    }
+    
+    // Funciones globales para manipular pasos
+    window.deleteStep = function(id) {
+      steps = steps.filter(item => item.id !== id);
+      updateStepsList();
+      saveStepsToStorage();
+      showToast('Paso eliminado');
+    };
+    
+    window.editStep = function(id) {
+      const step = steps.find(item => item.id === id);
+      if (step) {
+        document.getElementById('preparation-step').value = step.text;
+        
+        // Eliminar el paso actual, luego se volverá a agregar al editar
+        deleteStep(id);
+        
+        // Scroll al formulario
+        document.getElementById('preparation-step').scrollIntoView({behavior: 'smooth'});
+        document.getElementById('preparation-step').focus();
+      }
+    };
+    
+    // Manejo de fotos con fecha, ubicación y numeración
+    // Función para comprimir imágenes antes de guardarlas
+    function compressImage(file, quality = 0.7, maxWidth = 800) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+          const img = new Image();
+          img.src = event.target.result;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+
+            if (width > maxWidth) {
+              height = (maxWidth / width) * height;
+              width = maxWidth;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Comprimir a formato JPEG con la calidad especificada
+            const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+            resolve(compressedDataUrl);
+          };
+          img.onerror = (error) => reject(error);
+        };
+        reader.onerror = (error) => reject(error);
+      });
+    }
+
+    function handleFileSelect(event, containerId) {
+      const files = event.target.files;
+      const container = document.getElementById(containerId);
+      
+      // Determinar qué categoría de fotos es (ANTES, DURANTE, DESPUÉS)
+      let categoryText = '';
+      let categoryPrefix = '';
+      
+      if (containerId === 'before-photos') {
+        categoryText = 'ANTES';
+        categoryPrefix = 'A';
+      } else if (containerId === 'during-photos') {
+        categoryText = 'DURANTE';
+        categoryPrefix = 'D';
+      } else if (containerId === 'after-photos') {
+        categoryText = 'DESPUÉS';
+        categoryPrefix = 'P';
+      }
+      
+      if (files.length > 0) {
+        showToast(`${files.length} foto(s) seleccionada(s) - ${categoryText}`);
+      }
+      
+      // Obtener la fecha y hora actual
+      const now = new Date();
+      const dateString = now.toLocaleDateString('es-PE');
+      const timeString = now.toLocaleTimeString('es-PE');
+      const dateTimeString = `${dateString} ${timeString}`;
+      
+      // Intentar obtener la ubicación
+      getLocation().then(locationText => {
+        // Contar las fotos existentes para la numeración
+        let existingPhotos = container.querySelectorAll('.photo-item').length;
+        
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const photoNumber = existingPhotos + i + 1;
+
+          compressImage(file).then(compressedSrc => {
+            // Crear elemento para la foto con toda la información
+            const div = document.createElement('div');
+            div.className = 'photo-item';
+            
+            // Estructura de la foto con metadatos
+            div.innerHTML = `
+              <div class="photo-number">${categoryPrefix}${photoNumber}</div>
+              <img src="${compressedSrc}" alt="Foto ${categoryText} ${photoNumber}">
+              <div class="photo-info">
+                <div class="photo-date">${dateTimeString}</div>
+                <div class="photo-location">${locationText}</div>
+              </div>
+            `;
+            container.appendChild(div);
+            
+            // Guardar en localStorage con los metadatos
+            const photoData = {
+              src: compressedSrc,
+              category: categoryText,
+              number: photoNumber,
+              prefix: categoryPrefix,
+              date: dateTimeString,
+              location: locationText
+            };
+            
+            savePhotoToStorage(containerId, photoData);
+          }).catch(err => {
+            console.error('Error al comprimir la imagen:', err);
+            showToast('Error al procesar una de las imágenes', 'error');
+          });
+        }
+      }).catch(err => {
+        showToast('No se pudo obtener la ubicación, foto sin geolocalización', 'warning');
+        
+        // Continuar sin ubicación
+        let existingPhotos = container.querySelectorAll('.photo-item').length;
+        
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const photoNumber = existingPhotos + i + 1;
+
+          compressImage(file).then(compressedSrc => {
+            const div = document.createElement('div');
+            div.className = 'photo-item';
+            div.innerHTML = `
+              <div class="photo-number">${categoryPrefix}${photoNumber}</div>
+              <img src="${compressedSrc}" alt="Foto ${categoryText} ${photoNumber}">
+              <div class="photo-info">
+                <div class="photo-date">${dateTimeString}</div>
+              </div>
+            `;
+            container.appendChild(div);
+            
+            // Guardar en localStorage sin ubicación
+            const photoData = {
+              src: compressedSrc,
+              category: categoryText,
+              number: photoNumber,
+              prefix: categoryPrefix,
+              date: dateTimeString,
+              location: 'No disponible'
+            };
+            
+            savePhotoToStorage(containerId, photoData);
+          }).catch(err => {
+            console.error('Error al comprimir la imagen:', err);
+            showToast('Error al procesar una de las imágenes', 'error');
+          });
+        }
+      });
+    }
+    
+    // Función para obtener la ubicación del usuario
+    function getLocation() {
+      return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+          reject('Geolocalización no soportada en este dispositivo');
+          return;
+        }
+        
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            
+            // Intentar obtener el nombre de la ubicación mediante reverse geocoding
+            // Agregamos encabezados para evitar problemas CORS
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`, {
+              headers: {
+                'User-Agent': 'RecetasChefPeru/1.0 (maxsystem@hotmail.com)',
+                'Accept-Language': 'es'
+              }
+            }).then(response => response.json())
+              .then(data => {
+                let locationName = 'Ubicación desconocida';
+                
+                if (data && data.display_name) {
+                  // Extraer solo la parte relevante de la dirección
+                  const addressParts = data.display_name.split(',');
+                  locationName = addressParts.slice(0, 2).join(', ');
+                }
+                
+                resolve(locationName);
+              })
+              .catch(err => {
+                resolve(`Lat: ${latitude.toFixed(4)}, Lon: ${longitude.toFixed(4)}`);
+              });
+          },
+          error => {
+            reject('Error al obtener ubicación');
+          },
+          { 
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0
+          }
+        );
+      });
+    }
+    
+    const photoBefore = document.getElementById('photo-before');
+    if (photoBefore) {
+      photoBefore.addEventListener('change', function(e) {
+        console.log('Evento change en photo-before detectado');
+        handleFileSelect(e, 'before-photos');
+      });
+      console.log('Evento change asignado a photoBefore');
+    } else {
+      console.error('Elemento photo-before no encontrado');
+    }
+    
+    const photoDuring = document.getElementById('photo-during');
+    if (photoDuring) {
+      photoDuring.addEventListener('change', function(e) {
+        console.log('Evento change en photo-during detectado');
+        handleFileSelect(e, 'during-photos');
+      });
+      console.log('Evento change asignado a photoDuring');
+    } else {
+      console.error('Elemento photo-during no encontrado');
+    }
+    
+    const photoAfter = document.getElementById('photo-after');
+    if (photoAfter) {
+      photoAfter.addEventListener('change', function(e) {
+        console.log('Evento change en photo-after detectado');
+        handleFileSelect(e, 'after-photos');
+      });
+      console.log('Evento change asignado a photoAfter');
+    } else {
+      console.error('Elemento photo-after no encontrado');
+    }
+    
+    // Guardar fotos en localStorage con metadatos
+    function savePhotoToStorage(containerId, photoData) {
+      const storageKey = containerId + '-photos';
+      let photos = JSON.parse(localStorage.getItem(storageKey) || '[]');
+      photos.push(photoData);
+      localStorage.setItem(storageKey, JSON.stringify(photos));
+      
+      // Verificar que se guardó correctamente
+      const savedPhotos = JSON.parse(localStorage.getItem(storageKey) || '[]');
+      if (savedPhotos.length === photos.length) {
+        console.log(`Foto guardada exitosamente en ${storageKey}. Total: ${photos.length}`);
+      } else {
+        console.error(`Error al guardar foto en ${storageKey}`);
+      }
+    }
+    
+    // Cargar fotos guardadas con metadatos
+    function loadSavedPhotos() {
+      const containers = ['before-photos', 'during-photos', 'after-photos'];
+      
+      containers.forEach(containerId => {
+        const storageKey = containerId + '-photos';
+        const photos = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        const container = document.getElementById(containerId);
+        
+        photos.forEach((photo, index) => {
+          const div = document.createElement('div');
+          div.className = 'photo-item';
+          
+          // Comprobar si es el formato antiguo (string) o el nuevo (objeto)
+          if (typeof photo === 'string') {
+            // Formato antiguo - solo URL
+            div.innerHTML = `<img src="${photo}" alt="Foto">`;
+          } else {
+            // Formato nuevo con metadatos
+            div.innerHTML = `
+              <div class="photo-number">${photo.prefix || ''}${photo.number || index+1}</div>
+              <img src="${photo.src}" alt="Foto ${photo.category || ''} ${photo.number || index+1}">
+              <div class="photo-info">
+                <div class="photo-date">${photo.date || 'Sin fecha'}</div>
+                ${photo.location ? `<div class="photo-location">${photo.location}</div>` : ''}
+              </div>
+            `;
+          }
+          
+          container.appendChild(div);
+        });
+      });
+    }
+    
+    // Ejecutar al cargar
+    loadSavedPhotos();
+    
+    // Actualizar también las fotos en la sección de resumen
+    setTimeout(() => {
+      updateSummaryPhotos();
+      console.log('Fotos de resumen actualizadas después de cargar fotos principales');
+    }, 300);
+    
+    // Verificar si se cargaron correctamente las fotos
+    function verificarCargaFotos() {
+      const containers = ['before-photos', 'during-photos', 'after-photos'];
+      containers.forEach(containerId => {
+        const storageKey = containerId + '-photos';
+        const photos = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        const elementosDOM = document.getElementById(containerId).querySelectorAll('.photo-item').length;
+        console.log(`${containerId}: ${photos.length} fotos en localStorage, ${elementosDOM} elementos en DOM`);
+        if (photos.length > 0 && elementosDOM !== photos.length) {
+          console.warn(`Discrepancia en ${containerId}: ${photos.length} en localStorage vs ${elementosDOM} en DOM`);
+        }
+      });
+    }
+    setTimeout(verificarCargaFotos, 1000);
+    
+    // Mostrar las fotos por categorías en la sección de resultados
+    function updateSummaryPhotos() {
+      // Corregir las claves de almacenamiento para obtener las fotos correctamente
+      const containers = [
+        { id: 'summary-before-photos', storageKey: 'before-photos-photos' },
+        { id: 'summary-during-photos', storageKey: 'during-photos-photos' },
+        { id: 'summary-after-photos', storageKey: 'after-photos-photos' }
+      ];
+      
+      containers.forEach(container => {
+        const containerElement = document.getElementById(container.id);
+        if (!containerElement) return;
+        
+        containerElement.innerHTML = '';
+        let photosData = localStorage.getItem(container.storageKey);
+        let photos = [];
+        
+        try {
+          // Intentar parsear las fotos - podrían estar en diferentes formatos
+          if (photosData) {
+            photos = JSON.parse(photosData);
+            console.log(`Fotos cargadas para ${container.id}:`, photos.length);
+          }
+        } catch (error) {
+          console.error(`Error al parsear fotos para ${container.id}:`, error);
+          photos = [];
+        }
+        
+        if (!Array.isArray(photos) || photos.length === 0) {
+          containerElement.innerHTML = '<p style="text-align:center; color:var(--text-secondary); padding:16px;">No hay fotos aún</p>';
+          return;
+        }
+        
+        photos.forEach(photo => {
+          const photoElement = document.createElement('div');
+          photoElement.className = 'photo-item';
+          photoElement.style.overflow = 'hidden';
+          photoElement.style.borderRadius = '8px';
+          photoElement.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+          photoElement.style.position = 'relative';
+          photoElement.style.display = 'flex';
+          photoElement.style.flexDirection = 'column';
+          
+          // Crear contenedor para la imagen
+          const imgContainer = document.createElement('div');
+          imgContainer.style.height = '130px';
+          imgContainer.style.overflow = 'hidden';
+          
+          const img = document.createElement('img');
+          // Usar la propiedad correcta según el formato de la foto guardada
+          img.src = photo.src || photo.dataUrl || photo;
+          img.style.width = '100%';
+          img.style.height = '100%';
+          img.style.objectFit = 'cover';
+          img.style.transition = 'transform 0.3s ease';
+          
+          // Agregar efecto hover
+          img.onmouseover = () => { img.style.transform = 'scale(1.05)'; };
+          img.onmouseout = () => { img.style.transform = 'scale(1)'; };
+          
+          // Agregar número o prefijo de la foto si existe
+          if (photo.number || photo.prefix) {
+            const photoNumber = document.createElement('div');
+            photoNumber.className = 'photo-number';
+            photoNumber.textContent = photo.prefix ? `${photo.prefix}-${photo.number || ''}` : photo.number || '';
+            photoNumber.style.position = 'absolute';
+            photoNumber.style.top = '8px';
+            photoNumber.style.left = '8px';
+            photoNumber.style.backgroundColor = 'var(--primary-color)';
+            photoNumber.style.color = 'white';
+            photoNumber.style.fontWeight = '600';
+            photoNumber.style.padding = '4px 8px';
+            photoNumber.style.borderRadius = '4px';
+            photoNumber.style.fontSize = '12px';
+            photoNumber.style.zIndex = '1';
+            photoElement.appendChild(photoNumber);
+          }
+          
+          // Agregar metadatos (fecha y ubicación)
+          const metadataContainer = document.createElement('div');
+          metadataContainer.className = 'photo-metadata';
+          metadataContainer.style.padding = '8px';
+          metadataContainer.style.backgroundColor = '#f5f5f5';
+          metadataContainer.style.borderTop = '1px solid #e0e0e0';
+          metadataContainer.style.fontSize = '11px';
+          
+          // Fecha
+          const dateElement = document.createElement('div');
+          dateElement.className = 'photo-date';
+          dateElement.textContent = photo.date || 'Sin fecha';
+          dateElement.style.color = '#616161';
+          dateElement.style.marginBottom = '2px';
+          
+          // Ubicación
+          const locationElement = document.createElement('div');
+          locationElement.className = 'photo-location';
+          locationElement.textContent = photo.location || 'Sin ubicación';
+          locationElement.style.color = '#757575';
+          locationElement.style.overflow = 'hidden';
+          locationElement.style.textOverflow = 'ellipsis';
+          locationElement.style.whiteSpace = 'nowrap';
+          
+          metadataContainer.appendChild(dateElement);
+          metadataContainer.appendChild(locationElement);
+          
+          imgContainer.appendChild(img);
+          photoElement.appendChild(imgContainer);
+          photoElement.appendChild(metadataContainer);
+          containerElement.appendChild(photoElement);
+        });
+      });
+    }
+    
+    // Las fotos ahora se muestran todas simultáneamente en secciones separadas
+    
+    // Guardar descripciones
+    const saveButtons = ['save-before', 'save-during', 'save-after'];
+    
+    saveButtons.forEach(buttonId => {
+      document.getElementById(buttonId).addEventListener('click', function() {
+        const descriptionId = buttonId.replace('save-', 'description-');
+        const description = document.getElementById(descriptionId).value;
+        localStorage.setItem(descriptionId, description);
+        showToast('Descripción guardada');
+      });
+    });
+    
+    // Cargar descripciones guardadas
+    function loadSavedDescriptions() {
+      const descriptionIds = ['description-before', 'description-during', 'description-after'];
+      
+      descriptionIds.forEach(id => {
+        const description = localStorage.getItem(id);
+        if (description) {
+          document.getElementById(id).value = description;
+        }
+      });
+    }
+    
+    // Ejecutar al cargar
+    loadSavedDescriptions();
+    
+    // Título de la receta
+    const recipeTitle = document.getElementById('recipe-title');
+    recipeTitle.value = localStorage.getItem('recipe-title') || '';
+    
+    recipeTitle.addEventListener('input', () => {
+      localStorage.setItem('recipe-title', recipeTitle.value);
+      updateSummary();
+    });
+    
+    // Actualizar resumen
+    function updateSummary() {
+      try {
+        // Verificar que los elementos existan antes de actualizarlos
+        const summaryTitle = document.getElementById('summary-title');
+        if (summaryTitle) {
+          summaryTitle.textContent = document.getElementById('recipe-title').value || '-';
+        }
+        
+        // Actualizar el nombre del chef
+        const summaryChef = document.getElementById('summary-chef');
+        if (summaryChef) {
+          const chefName = document.getElementById('chef-name').value || '-';
+          summaryChef.textContent = chefName;
+          localStorage.setItem('chef-name', chefName);
+        }
+        
+        // Mostrar la fecha actual
+        const summaryDate = document.getElementById('summary-date');
+        if (summaryDate) {
+          const now = new Date();
+          const dateFormatted = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
+          summaryDate.textContent = dateFormatted;
+        }
+        
+        const summaryIngredients = document.getElementById('summary-ingredients');
+        if (summaryIngredients && typeof ingredients !== 'undefined') {
+          summaryIngredients.textContent = ingredients.length;
+        }
+        
+        // Asegurarnos de que steps esté definido
+        const stepsArray = typeof steps !== 'undefined' ? steps : [];
+        
+        // Verificar que steps esté definido antes de acceder a su longitud
+        const summarySteps = document.getElementById('summary-steps');
+        if (summarySteps) {
+          summarySteps.textContent = stepsArray.length;
+        }
+        
+        // Contar total de fotos
+        const summaryPhotos = document.getElementById('summary-photos');
+        if (summaryPhotos) {
+          try {
+            const beforePhotos = JSON.parse(localStorage.getItem('before-photos-photos') || '[]').length;
+            const duringPhotos = JSON.parse(localStorage.getItem('during-photos-photos') || '[]').length;
+            const afterPhotos = JSON.parse(localStorage.getItem('after-photos-photos') || '[]').length;
+            const totalPhotos = beforePhotos + duringPhotos + afterPhotos;
+            summaryPhotos.textContent = totalPhotos;
+            console.log(`Total fotos: ${totalPhotos} (ANTES: ${beforePhotos}, DURANTE: ${duringPhotos}, DESPUÉS: ${afterPhotos})`);
+          } catch (error) {
+            console.error('Error al contar fotos:', error);
+            summaryPhotos.textContent = '0';
+          }
+        }
+        
+        // Verificar que ingredients esté definido antes de calcular el costo total
+        let totalCost = 0;
+        if (typeof ingredients !== 'undefined') {
+          totalCost = ingredients.reduce((sum, item) => sum + item.price, 0);
+        }
+        
+        const summaryCost = document.getElementById('summary-cost');
+        if (summaryCost) {
+          summaryCost.textContent = `S/${totalCost.toFixed(2)}`;
+        }
+        
+        const suggestedPrice = totalCost * 1.3;
+        const suggestedPriceElement = document.getElementById('suggested-price');
+        if (suggestedPriceElement) {
+          suggestedPriceElement.textContent = `S/${suggestedPrice.toFixed(2)}`;
+        }
+      } catch (error) {
+        console.error('Error en updateSummary:', error);
+      }
+    }
+    
+    // ... (código anterior) ...
+
+    // Llamada inicial para actualizar el resumen al cargar la página
+    updateSummary();
+
+    // --- FUNCIONALIDAD DE IMPRESIÓN ---
+    document.getElementById('prepare-print-btn').addEventListener('click', preparePrintView);
+    document.getElementById('print-btn').addEventListener('click', () => {
+        window.print();
+    });
+
+    function preparePrintView() {
+    const printContent = document.getElementById('print-content');
+    const recipeTitle = localStorage.getItem('recipe-title') || 'Mi Receta';
+    const chefName = localStorage.getItem('chef-name') || 'Chef';
+  // Usar el mismo campo de chef para mostrar como "Realizado por"
+  const studentName = chefName;
+    const ingredientes = JSON.parse(localStorage.getItem('ingredients')) || [];
+    const pasos = JSON.parse(localStorage.getItem('steps')) || [];
+    const fotosAntes = JSON.parse(localStorage.getItem('before-photos-photos')) || [];
+    const fotosDurante = JSON.parse(localStorage.getItem('during-photos-photos')) || [];
+    const fotosDespues = JSON.parse(localStorage.getItem('after-photos-photos')) || [];
+    const bitacoraEntries = JSON.parse(localStorage.getItem('bitacora')) || [];
+
+    let costoTotal = 0;
+    if (ingredientes.length > 0) {
+      costoTotal = ingredientes.reduce((sum, item) => sum + (item.price || 0), 0);
+    }
+    const precioVenta = costoTotal * 1.3;
+
+    // Intentar regenerar el gráfico si no existe la imagen
+    let chartImage = localStorage.getItem('breakevenChartImage');
+    if (!chartImage && window.generarGraficoPuntoEquilibrio) {
+      // Obtener los valores actuales de la sección de resultado
+      const costosFijos = parseFloat(document.getElementById('costos-fijos')?.value) || 0;
+      const costoUnitarioExtra = parseFloat(document.getElementById('costo-unitario-extra')?.value) || 0;
+      const precioVentaInput = parseFloat(document.getElementById('precio-venta')?.value) || 0;
+      const cantidadProducida = parseFloat(document.getElementById('cantidad-producida')?.value) || 0;
+      let costoVariableUnitario = cantidadProducida > 0 ? (costoTotal / cantidadProducida) : 0;
+      costoVariableUnitario += costoUnitarioExtra;
+      let unidadesEquilibrio = (precioVentaInput - costoVariableUnitario) > 0 ? (costosFijos / (precioVentaInput - costoVariableUnitario)) : 0;
+      unidadesEquilibrio = Math.max(0, Math.round(unidadesEquilibrio));
+      // Crear canvas temporal oculto
+      let tempCanvas = document.createElement('canvas');
+      tempCanvas.width = 600;
+      tempCanvas.height = 400;
+      tempCanvas.style.display = 'none';
+      document.body.appendChild(tempCanvas);
+      tempCanvas.id = 'break-even-chart-temp';
+      // Generar el gráfico en el canvas temporal
+      const ok = window.generarGraficoPuntoEquilibrio(costosFijos, costoVariableUnitario, precioVentaInput, unidadesEquilibrio, tempCanvas);
+      if (ok) {
+        chartImage = tempCanvas.toDataURL('image/png');
+        localStorage.setItem('breakevenChartImage', chartImage);
+      }
+      document.body.removeChild(tempCanvas);
+    }
+
+    let html = `
+
+            <h1 class="print-title">${recipeTitle}</h1>
+            ${studentName ? `<p class="meta-info"><strong>Realizado por:</strong> ${studentName}</p>` : ''}
+            <p class="meta-info">Creado el: ${new Date().toLocaleDateString('es-PE')}</p>
+            
+            <div class="print-section">
+                <h2>Ingredientes</h2>
+                <div class="print-grid">
+                    ${ingredientes.map(ing => `
+                        <div class="print-card">
+                            <strong>${ing.name}</strong> - ${ing.quantity} ${ing.unit}<br>
+                            <small>Costo: S/${(ing.price || 0).toFixed(2)}</small>
+                        </div>
+                    `).join('') || '<p>No hay ingredientes.</p>'}
+                </div>
+            </div>
+
+
+      <div class="print-section">
+        <h2>Pasos de Preparación</h2>
+        <ol>
+          ${pasos.map(paso => `<li>${paso.text}</li>`).join('') || '<li>No hay pasos.</li>'}
+        </ol>
+        <div id="dop-diagram-print" style="margin-top:32px; text-align:center;">
+          ${pasos.length > 0 ? generarDOPSVG(pasos) : '<p style="color:#888;">No hay pasos para mostrar el diagrama.</p>'}
+        </div>
+      </div>
+
+            <div class="print-section photo-section">
+                <h2>Fotos del Proceso</h2>
+                <h3>Antes</h3>
+                <div class="photo-grid">
+                    ${fotosAntes.map((foto, index) => `
+                        <div class="photo-item">
+                            <img src="${foto.src}" alt="Foto Antes ${index + 1}">
+                            <p>${foto.date || ''}</p>
+                        </div>
+                    `).join('') || '<p>No hay fotos.</p>'}
+                </div>
+                <h3>Durante</h3>
+                <div class="photo-grid">
+                    ${fotosDurante.map((foto, index) => `
+                        <div class="photo-item">
+                            <img src="${foto.src}" alt="Foto Durante ${index + 1}">
+                            <p>${foto.date || ''}</p>
+                        </div>
+                    `).join('') || '<p>No hay fotos.</p>'}
+                </div>
+                <h3>Después</h3>
+                <div class="photo-grid">
+                    ${fotosDespues.map((foto, index) => `
+                        <div class="photo-item">
+                            <img src="${foto.src}" alt="Foto Después ${index + 1}">
+                            <p>${foto.date || ''}</p>
+                        </div>
+                    `).join('') || '<p>No hay fotos.</p>'}
+                </div>
+            </div>
+
+            <div class="print-section">
+                <h2>Bitácora</h2>
+                ${bitacoraEntries.map(entry => `
+                    <div class="logbook-entry">
+                        <p><strong>Fecha:</strong> ${new Date(entry.date).toLocaleString('es-PE')}</p>
+                        <p><strong>${entry.title} (${entry.category})</strong></p>
+                        <p>${entry.text}</p>
+                        ${entry.location ? `<p><small>Ubicación: ${entry.location}</small></p>` : ''}
+                    </div>
+                `).join('') || '<p>No hay anotaciones en la bitácora.</p>'}
+            </div>
+
+            <div class="print-section">
+                <h2>Análisis de Costos y Punto de Equilibrio</h2>
+                <p><strong>Costo total de ingredientes:</strong> S/${costoTotal.toFixed(2)}</p>
+                <p><strong>Precio sugerido de venta (30% margen):</strong> S/${precioVenta.toFixed(2)}</p>
+                ${chartImage ? `<div class="chart-container" style="text-align:center; margin-top:16px;"><img src="${chartImage}" alt="Gráfico de Punto de Equilibrio" style="max-width:100%; border-radius:8px;"></div>` : '<p>No se ha generado el gráfico de punto de equilibrio.</p>'}
+                <div style="margin-top:32px; text-align:center;">
+                  <h3 style="color:#1976d2; font-size:18px; margin-bottom:8px;">Gráfica para dibujar el Punto de Equilibrio</h3>
+                  <div style="overflow-x:auto; display:inline-block; max-width:100%;">
+                  <svg width="700" height="400" viewBox="0 0 700 400" style="background:#fff; border:1px solid #bbb; border-radius:8px; max-width:100%; height:auto;">
+                    <!-- Líneas de referencia horizontales -->
+                    <g stroke="#eee" stroke-width="1">
+                      <line x1="100" y1="350" x2="650" y2="350" />
+                      <line x1="100" y1="290" x2="650" y2="290" />
+                      <line x1="100" y1="230" x2="650" y2="230" />
+                      <line x1="100" y1="170" x2="650" y2="170" />
+                      <line x1="100" y1="110" x2="650" y2="110" />
+                    </g>
+                    <!-- Eje X -->
+                    <line x1="100" y1="350" x2="680" y2="350" stroke="#222" stroke-width="2" marker-end="url(#arrowhead)" />
+                    <!-- Eje Y -->
+                    <line x1="120" y1="370" x2="120" y2="50" stroke="#222" stroke-width="2" marker-end="url(#arrowhead)" />
+                    <!-- Etiquetas de ejes -->
+                    <text x="670" y="370" font-size="18" fill="#222">Unidades (x)</text>
+                    <text x="110" y="70" font-size="18" fill="#222">Monto (S/)</text>
+                    <!-- Leyenda -->
+                    <rect x="200" y="370" width="30" height="8" fill="none" stroke="#FFA000" stroke-width="4" stroke-dasharray="8,4"/>
+                    <text x="240" y="380" font-size="16" fill="#888">Costos Fijos</text>
+                    <rect x="350" y="370" width="30" height="8" fill="none" stroke="#E53935" stroke-width="4"/>
+                    <text x="390" y="380" font-size="16" fill="#888">Costos Totales</text>
+                    <rect x="500" y="370" width="30" height="8" fill="none" stroke="#43A047" stroke-width="4"/>
+                    <text x="540" y="380" font-size="16" fill="#888">Ingresos</text>
+                    <!-- Definir flecha -->
+                    <defs>
+                      <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#222"/>
+                      </marker>
+                    </defs>
+                  </svg>
+                  <div style="color:#888; font-size:13px; margin-top:4px;">Dibuja aquí el punto de equilibrio y las líneas de costos e ingresos según tus datos</div>
+                </div>
+            </div>
+        `;
+
+        printContent.innerHTML = html;
+    // --- DOP SVG para impresión ---
+    function generarDOPSVG(pasos) {
+      const circleRadius = 28;
+      const stepGap = 80;
+      const width = Math.max(360, pasos.length * (circleRadius * 2 + stepGap));
+      const height = 120;
+      let svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">`;
+      pasos.forEach((paso, i) => {
+        const cx = circleRadius + i * (circleRadius * 2 + stepGap);
+        const cy = height / 2;
+        // Flecha al siguiente paso
+        if (i < pasos.length - 1) {
+          const nextCx = circleRadius + (i + 1) * (circleRadius * 2 + stepGap);
+          svg += `<line x1="${cx + circleRadius}" y1="${cy}" x2="${nextCx - circleRadius}" y2="${cy}" stroke="#1976d2" stroke-width="3" marker-end="url(#arrowhead)"/>`;
+        }
+        // Círculo del paso
+        svg += `<circle cx="${cx}" cy="${cy}" r="${circleRadius}" fill="#fff" stroke="#1976d2" stroke-width="3"/>`;
+        // Número de paso
+        svg += `<text x="${cx}" y="${cy - 6}" text-anchor="middle" font-size="20" font-weight="bold" fill="#1976d2">${i + 1}</text>`;
+        // Texto del paso (máx 32 caracteres)
+        let texto = paso.text.length > 32 ? paso.text.slice(0, 29) + '…' : paso.text;
+        svg += `<text x="${cx}" y="${cy + 22}" text-anchor="middle" font-size="12" fill="#333">${texto.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</text>`;
+      });
+      // Definir la flecha
+      svg += `<defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#1976d2"/></marker></defs>`;
+      svg += `</svg>`;
+      return svg;
+    }
+        showToast('Vista previa actualizada.');
+    }
+    // --- FIN FUNCIONALIDAD DE IMPRESIÓN ---
+
+    // Función para mostrar notificaciones (toasts)
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.textContent = message;
+      toast.style.position = 'fixed';
+      toast.style.bottom = '80px';
+      toast.style.left = '50%';
+      toast.style.transform = 'translateX(-50%)';
+      toast.style.padding = '12px 20px';
+      toast.style.borderRadius = 'var(--border-radius)';
+      toast.style.color = 'white';
+      toast.style.zIndex = '1000';
+      toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+      
+      if (type === 'error') {
+        toast.style.backgroundColor = '#D32F2F';
+      } else if (type === 'warning') {
+        toast.style.backgroundColor = '#FFA000';
+      } else {
+        toast.style.backgroundColor = '#388E3C';
+      }
+      
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    }
+
+    // Cargar nombre del chef
+    const chefNameInput = document.getElementById('chef-name');
+    if (chefNameInput) {
+        chefNameInput.value = localStorage.getItem('chef-name') || '';
+        chefNameInput.addEventListener('input', (e) => {
+            localStorage.setItem('chef-name', e.target.value);
+            updateSummary();
+        });
+    }
+
+    // Botón de borrar todo
+    const resetAllButton = document.getElementById('reset-all-header');
+    if (resetAllButton) {
+        resetAllButton.addEventListener('click', () => {
+            if (confirm('¿Estás seguro de que quieres borrar TODOS los datos de la receta? Esta acción no se puede deshacer.')) {
+                localStorage.clear();
+                location.reload();
+            }
+        });
+    }
+    // --- BITÁCORA ---
+    // Guardar anotaciones de la bitácora
+    const addLogbookBtn = document.getElementById('add-logbook-entry');
+    const logbookList = document.getElementById('logbook-entries-list');
+    function renderLogbook() {
+      const entries = JSON.parse(localStorage.getItem('bitacora') || '[]');
+      logbookList.innerHTML = '';
+      if (entries.length === 0) {
+        logbookList.innerHTML = '<li style="color:#888;">No hay anotaciones aún.</li>';
+        return;
+      }
+      entries.forEach(entry => {
+        const li = document.createElement('li');
+        li.className = 'logbook-entry';
+        li.innerHTML = `<strong>${entry.title}</strong> <span style="color:#888;">(${entry.category})</span><br>
+          <span style="font-size:12px;">${entry.date}</span><br>
+          <span>${entry.text}</span>`;
+        logbookList.appendChild(li);
+      });
+    }
+    if (addLogbookBtn) {
+      addLogbookBtn.addEventListener('click', () => {
+        const date = document.getElementById('logbook-date').value || new Date().toLocaleDateString('es-PE');
+        const title = document.getElementById('logbook-title').value.trim();
+        const category = document.getElementById('logbook-category').value;
+        const text = document.getElementById('logbook-text').value.trim();
+        if (!title || !text) {
+          showToast('Completa título y descripción', 'warning');
+          return;
+        }
+        const entry = { date, title, category, text };
+        const entries = JSON.parse(localStorage.getItem('bitacora') || '[]');
+        entries.push(entry);
+        localStorage.setItem('bitacora', JSON.stringify(entries));
+        renderLogbook();
+        document.getElementById('logbook-title').value = '';
+        document.getElementById('logbook-text').value = '';
+        showToast('Anotación guardada');
+      });
+      renderLogbook();
+    }
+
+    // --- PUNTO DE EQUILIBRIO ---
+    const calcularBtn = document.getElementById('calcular-equilibrio');
+    if (calcularBtn) {
+      calcularBtn.addEventListener('click', () => {
+        const costosFijos = parseFloat(document.getElementById('costos-fijos').value) || 0;
+        const costoUnitarioExtra = parseFloat(document.getElementById('costo-unitario-extra').value) || 0;
+        const precioVenta = parseFloat(document.getElementById('precio-venta').value) || 0;
+        const cantidadProducida = parseFloat(document.getElementById('cantidad-producida').value) || 0;
+        // Calcular costo variable unitario (ingredientes + extra)
+        let ingredientes = JSON.parse(localStorage.getItem('ingredients') || '[]');
+        let costoTotalIngredientes = ingredientes.reduce((sum, item) => sum + (item.price || 0), 0);
+        let costoVariableUnitario = cantidadProducida > 0 ? (costoTotalIngredientes / cantidadProducida) : 0;
+        costoVariableUnitario += costoUnitarioExtra;
+        // Calcular punto de equilibrio
+        let unidadesEquilibrio = (precioVenta - costoVariableUnitario) > 0 ? (costosFijos / (precioVenta - costoVariableUnitario)) : 0;
+        unidadesEquilibrio = Math.max(0, Math.round(unidadesEquilibrio));
+        let ingresosEquilibrio = unidadesEquilibrio * precioVenta;
+        // Mostrar en la UI
+        document.getElementById('punto-equilibrio-unidades').textContent = unidadesEquilibrio;
+        document.getElementById('punto-equilibrio-ingresos').textContent = 'S/' + ingresosEquilibrio.toFixed(2);
+        // Guardar en localStorage
+        localStorage.setItem('puntoEquilibrioUnidades', unidadesEquilibrio);
+        localStorage.setItem('puntoEquilibrioIngresos', ingresosEquilibrio);
+        // Generar gráfico y guardar imagen
+        if (window.generarGraficoPuntoEquilibrio) {
+          setTimeout(() => {
+            const ok = window.generarGraficoPuntoEquilibrio(costosFijos, costoVariableUnitario, precioVenta, unidadesEquilibrio);
+            if (ok) {
+              const canvas = document.getElementById('break-even-chart');
+              if (canvas) {
+                const imgData = canvas.toDataURL('image/png');
+                localStorage.setItem('breakevenChartImage', imgData);
+              }
+            }
+          }, 300);
+        }
+        showToast('Punto de equilibrio calculado');
+      });
+    }
+});
+</script>
+</body>
+</html>

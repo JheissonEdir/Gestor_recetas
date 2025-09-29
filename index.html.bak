@@ -1,0 +1,1851 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#FF5252">
+  <title>Recetas Chef Perú</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    /* Variables */
+    :root {
+      --primary-color: #FF5252;
+      --primary-dark: #C50E29;
+      --primary-light: #FF867F;
+      --secondary-color: #4CAF50;
+      --background-color: #F9F9F9;
+      --surface-color: #FFFFFF;
+      --text-color: #333333;
+      --text-secondary: #757575;
+      --border-radius: 12px;
+      --shadow: 0 4px 6px rgba(0,0,0,0.1);
+      --transition: all 0.3s ease;
+    }
+    
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+    
+    /* Animaciones */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes scaleIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    
+    /* Header */
+    .app-header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 16px 20px;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .app-title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .app-title .material-icons {
+      font-size: 28px;
+    }
+    
+    .recipe-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: var(--transition);
+    }
+    
+    .recipe-input:focus {
+      outline: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    /* Contenedor principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 16px;
+      padding-bottom: 80px; /* Espacio para el menú inferior */
+    }
+    
+    /* Tarjetas */
+    .card {
+      background-color: var(--surface-color);
+      border-radius: var(--border-radius);
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      color: var(--primary-color);
+      font-weight: 600;
+      font-size: 20px;
+    }
+    
+    /* Formularios */
+    .form-group {
+      margin-bottom: 16px;
+    }
+    
+    .input-label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    
+    .text-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #e0e0e0;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      font-family: 'Poppins', sans-serif;
+      transition: var(--transition);
+    }
+    
+    .text-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(255,82,82,0.2);
+    }
+    
+    .protected-input {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23FF5252' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'%3E%3C/path%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: calc(100% - 10px) 10px;
+      background-size: 18px;
+      padding-right: 36px;
+      border-left: 3px solid #FF5252;
+    }
+    
+    .input-row {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .input-row > * {
+      flex: 1;
+    }
+    
+    select.text-input {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23757575' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
+      padding-right: 36px;
+      appearance: none;
+    }
+    
+    /* Botones */
+    .btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      font-weight: 500;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      box-shadow: 0 4px 8px rgba(197,14,41,0.3);
+    }
+    
+    .btn-primary:active {
+      transform: translateY(1px);
+    }
+    
+    .btn-secondary {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+    
+    .btn-block {
+      width: 100%;
+    }
+    
+    .btn-icon {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+    
+    .btn-icon:hover {
+      background-color: rgba(0,0,0,0.05);
+      color: var(--primary-color);
+    }
+    
+    /* Pestañas de navegación inferior */
+    .nav-tabs {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      background-color: var(--surface-color);
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      z-index: 10;
+    }
+    
+    .nav-tab {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 8px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+      font-size: 12px;
+    }
+    
+    .nav-tab .material-icons {
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+    
+    .nav-tab.active {
+      color: var(--primary-color);
+    }
+    
+    /* Contenido de pestañas */
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    /* Listas */
+    .list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .list-item {
+      padding: 16px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .list-item:last-child {
+      border-bottom: none;
+    }
+    
+    .list-item-content {
+      flex: 1;
+    }
+    
+    .list-item-title {
+      font-weight: 500;
+      margin: 0;
+    }
+    
+    .list-item-subtitle {
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin: 4px 0 0;
+    }
+    
+    .list-item-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .badge-price {
+      background-color: rgba(76, 175, 80, 0.15);
+      color: #2e7d32;
+    }
+    
+    /* Grillas de fotos */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+    
+    .photo-item {
+      aspect-ratio: 1;
+      overflow: hidden;
+      border-radius: var(--border-radius);
+      background-color: #f0f0f0;
+      position: relative;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+    }
+    
+    .photo-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: var(--transition);
+    }
+    
+    .photo-item:hover img {
+      transform: scale(1.05);
+    }
+    
+    .photo-number {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      z-index: 1;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .photo-info {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 8px;
+      font-size: 10px;
+      transition: var(--transition);
+      transform: translateY(100%);
+    }
+    
+    .photo-item:hover .photo-info {
+      transform: translateY(0);
+    }
+    
+    .photo-date {
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+    
+    .photo-location {
+      font-size: 9px;
+      opacity: 0.9;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    /* Diseño específico para entrada de archivo */
+    .file-input-wrapper {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+      width: 100%;
+    }
+    
+    .file-input-wrapper input[type="file"] {
+      opacity: 0;
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+    
+    .file-input-button {
+      background-color: #f0f0f0;
+      color: var(--text-secondary);
+      border: 2px dashed #ccc;
+      border-radius: var(--border-radius);
+      padding: 16px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: var(--transition);
+    }
+    
+    .file-input-button:hover {
+      background-color: #e8e8e8;
+      border-color: var(--primary-color);
+    }
+    
+    /* Tarjeta de resumen */
+    .summary-card {
+      border-left: 4px solid var(--primary-color);
+      padding-left: 16px;
+    }
+    
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    
+    .summary-label {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    
+    .summary-value {
+      font-weight: 600;
+    }
+    
+    .summary-value.highlight {
+      color: var(--primary-color);
+      font-size: 18px;
+    }
+    
+    /* Media queries para diferentes tamaños de pantalla */
+    @media (min-width: 768px) {
+      .app-header {
+        padding: 20px 24px;
+      }
+      
+      .header-content {
+        flex-direction: row;
+        justify-content: space-between;
+      }
+      
+      .app-title {
+        margin-right: 24px;
+      }
+      
+      .recipe-input {
+        max-width: 400px;
+      }
+      
+      .nav-tabs {
+        position: static;
+        margin-bottom: 24px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+      }
+      
+      .container {
+        padding: 24px;
+        padding-bottom: 24px;
+      }
+      
+      .photo-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-content">
+      <h1 class="app-title">
+        <span class="material-icons">restaurant</span>
+        Recetas Chef Perú
+      </h1>
+      <input type="text" class="recipe-input" id="recipe-title" placeholder="Nombre de la receta...">
+    </div>
+    <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+      <button id="reset-all-header" class="btn" style="background-color: #F44336; color: white; padding: 8px 12px; font-size: 14px;">
+        <span class="material-icons" style="font-size: 16px;">delete_forever</span>
+        Borrar Todo
+      </button>
+    </div>
+  </header>
+  
+  <!-- Contenedor principal -->
+  <div class="container">
+    <!-- Contenido de la pestaña Ingredientes -->
+    <div class="tab-content active" id="ingredients-tab">
+      <div class="card">
+        <h2>Ingredientes</h2>
+        
+        <div class="form-group">
+          <label class="input-label" for="ingredient-name">Nombre del ingrediente</label>
+          <input type="text" class="text-input" id="ingredient-name" placeholder="Ej: Harina de trigo">
+        </div>
+        
+        <div class="form-group">
+          <div class="input-row">
+            <div>
+              <label class="input-label" for="ingredient-quantity">Cantidad</label>
+              <input type="number" class="text-input" id="ingredient-quantity" placeholder="Ej: 500">
+            </div>
+            <div>
+              <label class="input-label" for="ingredient-unit">Unidad</label>
+              <select class="text-input" id="ingredient-unit">
+                <option value="g">gramos (g)</option>
+                <option value="kg">kilogramos (kg)</option>
+                <option value="ml">mililitros (ml)</option>
+                <option value="l">litros (l)</option>
+                <option value="unidad">unidad(es)</option>
+                <option value="cucharada">cucharada(s)</option>
+                <option value="taza">taza(s)</option>
+                <option value="pizca">pizca(s)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="input-label" for="ingredient-price">Precio (S/)</label>
+          <input type="number" class="text-input" id="ingredient-price" placeholder="Ej: 25.50">
+        </div>
+        
+        <button class="btn btn-primary btn-block" id="add-ingredient">
+          <span class="material-icons">add</span>
+          Agregar Ingrediente
+        </button>
+        
+        <div style="margin-top: 24px;">
+          <h3 style="color: var(--text-secondary); font-size: 16px; font-weight: 500;">Lista de ingredientes</h3>
+          <ul class="list" id="ingredients-list">
+            <!-- Los ingredientes se agregarán aquí mediante JavaScript -->
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Contenido de la pestaña Preparación -->
+    <div class="tab-content" id="preparation-tab">
+      <div class="card">
+        <h2>Preparación</h2>
+        
+        <div class="form-group">
+          <label class="input-label" for="preparation-step">Describe el paso</label>
+          <textarea class="text-input protected-input" id="preparation-step" rows="3" 
+            placeholder="Ej: Mezclar la harina con la levadura..." 
+            onpaste="showToast('No se permite pegar texto en la preparación', 'error'); return false;" 
+            oncopy="showToast('No se permite copiar texto de la preparación', 'error'); return false;"
+            oncontextmenu="showToast('No se permite copiar/pegar en esta área', 'error'); return false;"></textarea>
+          <div class="input-hint" style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+            <span class="material-icons" style="font-size: 14px; vertical-align: middle;">info</span>
+            No se permite copiar ni pegar texto en la preparación
+          </div>
+        </div>
+        
+        <button class="btn btn-primary btn-block" id="add-step">
+          <span class="material-icons">playlist_add</span>
+          Agregar Paso
+        </button>
+        
+        <div style="margin-top: 24px;">
+          <h3 style="color: var(--text-secondary); font-size: 16px; font-weight: 500;">Pasos a seguir</h3>
+          <ol class="list" id="steps-list" style="padding-left: 20px;">
+            <!-- Los pasos se agregarán aquí mediante JavaScript -->
+          </ol>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Contenido de la pestaña Fotos -->
+    <div class="tab-content" id="photos-tab">
+      <div class="card">
+        <h2>ANTES de la preparación</h2>
+        <p style="color: var(--text-secondary); margin-top: -8px; margin-bottom: 12px;">Fotos de los ingredientes antes de iniciar la preparación</p>
+        <div style="background-color: #f9f4e8; padding: 8px 12px; border-radius: 8px; margin-bottom: 12px;">
+          <span style="color: var(--primary-color); font-weight: 600;">A1, A2, A3...</span> Fotos numeradas automáticamente con fecha y ubicación
+        </div>
+        
+        <div class="file-input-wrapper">
+          <div class="file-input-button">
+            <span class="material-icons">add_photo_alternate</span>
+            <span>Seleccionar fotos de ANTES</span>
+          </div>
+          <input type="file" id="photo-before" accept="image/*" multiple>
+        </div>
+        
+        <div class="form-group" style="margin-top: 16px;">
+          <label class="input-label" for="description-before">Descripción</label>
+          <textarea class="text-input" id="description-before" rows="2" placeholder="Describe las fotos..."></textarea>
+        </div>
+        
+        <button class="btn btn-secondary" id="save-before">
+          <span class="material-icons">save</span>
+          Guardar descripción
+        </button>
+        
+        <div class="photo-grid" id="before-photos">
+          <!-- Las fotos se mostrarán aquí -->
+        </div>
+      </div>
+      
+      <div class="card">
+        <h2>DURANTE la preparación</h2>
+        <p style="color: var(--text-secondary); margin-top: -8px; margin-bottom: 12px;">Fotos del proceso de preparación en curso</p>
+        <div style="background-color: #f9f4e8; padding: 8px 12px; border-radius: 8px; margin-bottom: 12px;">
+          <span style="color: var(--primary-color); font-weight: 600;">D1, D2, D3...</span> Fotos numeradas automáticamente con fecha y ubicación
+        </div>
+        
+        <div class="file-input-wrapper">
+          <div class="file-input-button">
+            <span class="material-icons">add_photo_alternate</span>
+            <span>Seleccionar fotos de DURANTE</span>
+          </div>
+          <input type="file" id="photo-during" accept="image/*" multiple>
+        </div>
+        
+        <div class="form-group" style="margin-top: 16px;">
+          <label class="input-label" for="description-during">Descripción</label>
+          <textarea class="text-input" id="description-during" rows="2" placeholder="Describe las fotos..."></textarea>
+        </div>
+        
+        <button class="btn btn-secondary" id="save-during">
+          <span class="material-icons">save</span>
+          Guardar descripción
+        </button>
+        
+        <div class="photo-grid" id="during-photos">
+          <!-- Las fotos se mostrarán aquí -->
+        </div>
+      </div>
+      
+      <div class="card">
+        <h2>DESPUÉS de la preparación</h2>
+        <p style="color: var(--text-secondary); margin-top: -8px; margin-bottom: 12px;">Fotos del resultado final y la presentación del plato</p>
+        <div style="background-color: #f9f4e8; padding: 8px 12px; border-radius: 8px; margin-bottom: 12px;">
+          <span style="color: var(--primary-color); font-weight: 600;">P1, P2, P3...</span> Fotos numeradas automáticamente con fecha y ubicación
+        </div>
+        
+        <div class="file-input-wrapper">
+          <div class="file-input-button">
+            <span class="material-icons">add_photo_alternate</span>
+            <span>Seleccionar fotos de DESPUÉS</span>
+          </div>
+          <input type="file" id="photo-after" accept="image/*" multiple>
+        </div>
+        
+        <div class="form-group" style="margin-top: 16px;">
+          <label class="input-label" for="description-after">Descripción</label>
+          <textarea class="text-input" id="description-after" rows="2" placeholder="Describe las fotos..."></textarea>
+        </div>
+        
+        <button class="btn btn-secondary" id="save-after">
+          <span class="material-icons">save</span>
+          Guardar descripción
+        </button>
+        
+        <div class="photo-grid" id="after-photos">
+          <!-- Las fotos se mostrarán aquí -->
+        </div>
+      </div>
+    </div>
+    
+    <!-- Contenido de la pestaña Bitácora -->
+    <div class="tab-content" id="logbook-tab">
+      <div class="card">
+        <h2>Bitácora de Trabajo</h2>
+        
+        <div class="form-group">
+          <label class="input-label" for="logbook-date">Fecha</label>
+          <input type="date" class="text-input" id="logbook-date">
+        </div>
+        
+        <div class="form-group">
+          <label class="input-label" for="logbook-title">Título de la anotación</label>
+          <input type="text" class="text-input" id="logbook-title" placeholder="Ej: Problema con suministros">
+        </div>
+        
+        <div class="form-group">
+          <label class="input-label" for="logbook-category">Categoría</label>
+          <select class="text-input" id="logbook-category">
+            <option value="materiales">Materiales/Ingredientes</option>
+            <option value="equipo">Equipo de trabajo</option>
+            <option value="proceso">Proceso de preparación</option>
+            <option value="cliente">Cliente/Requisitos</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="input-label" for="logbook-text">Descripción</label>
+          <textarea class="text-input" id="logbook-text" rows="4" placeholder="Describe detalladamente lo sucedido..."></textarea>
+        </div>
+        
+        <button class="btn btn-primary btn-block" id="add-logbook-entry">
+          <span class="material-icons">add</span>
+          Agregar Anotación
+        </button>
+        
+        <div style="margin-top: 24px;">
+          <h3 style="color: var(--text-secondary); font-size: 16px; font-weight: 500;">Anotaciones</h3>
+          <ul class="list" id="logbook-entries-list">
+            <!-- Las anotaciones se agregarán aquí mediante JavaScript -->
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Contenido de la pestaña Resultado -->
+    <div class="tab-content" id="result-tab">
+      <div class="card">
+        <h2>Resultado Final</h2>
+        
+        <div class="summary-card">
+          <div class="summary-row">
+            <span class="summary-label">Título:</span>
+            <span class="summary-value" id="summary-title">-</span>
+          </div>
+          
+          <div class="summary-row">
+            <span class="summary-label">Total de ingredientes:</span>
+            <span class="summary-value" id="summary-ingredients">0</span>
+          </div>
+          
+          <div class="summary-row">
+            <span class="summary-label">Pasos de preparación:</span>
+            <span class="summary-value" id="summary-steps">0</span>
+          </div>
+          
+          <div class="summary-row">
+            <span class="summary-label">Costo total:</span>
+            <span class="summary-value" id="summary-cost">S/0.00</span>
+          </div>
+          
+          <div class="summary-row">
+            <span class="summary-label">Precio sugerido (30% margen):</span>
+            <span class="summary-value highlight" id="suggested-price">S/0.00</span>
+          </div>
+        </div>
+        
+        <div style="margin-top: 24px;">
+          <h3 style="color: var(--primary-color); font-size: 18px; font-weight: 600;">Punto de Equilibrio</h3>
+          
+          <div class="form-group">
+            <label class="input-label" for="costos-fijos">Costos fijos (S/)</label>
+            <input type="number" step="0.01" class="text-input" id="costos-fijos" placeholder="Ej: alquiler, servicios, etc.">
+          </div>
+          
+          <div class="form-group">
+            <label class="input-label" for="costo-unitario-extra">Costo unitario extra (S/)</label>
+            <input type="number" step="0.01" class="text-input" id="costo-unitario-extra" placeholder="Costos adicionales por unidad">
+          </div>
+          
+          <div class="form-group">
+            <label class="input-label" for="precio-venta">Precio de venta (S/)</label>
+            <input type="number" step="0.01" class="text-input" id="precio-venta">
+          </div>
+          
+          <button class="btn btn-secondary" id="calcular-equilibrio">
+            <span class="material-icons">calculate</span>
+            Calcular Punto de Equilibrio
+          </button>
+          
+          <div class="summary-card" style="margin-top: 16px;">
+            <div class="summary-row">
+              <span class="summary-label">Punto de equilibrio (unidades):</span>
+              <span class="summary-value" id="punto-equilibrio-unidades">0</span>
+            </div>
+            
+            <div class="summary-row">
+              <span class="summary-label">Ingresos en punto de equilibrio:</span>
+              <span class="summary-value" id="punto-equilibrio-ingresos">S/0.00</span>
+            </div>
+          </div>
+        </div>
+        
+        <div style="margin-top: 24px;">
+          <button class="btn btn-primary btn-block" id="generate-pdf">
+            <span class="material-icons">picture_as_pdf</span>
+            Generar PDF
+          </button>
+          
+          <button class="btn btn-secondary btn-block" style="margin-top: 12px;" id="share-recipe">
+            <span class="material-icons">share</span>
+            Compartir Receta
+          </button>
+          
+          <button class="btn btn-block" style="margin-top: 20px; background-color: #F44336; color: white; font-weight: bold; box-shadow: 0 4px 8px rgba(244, 67, 54, 0.3);" id="reset-all">
+            <span class="material-icons">delete_forever</span>
+            BORRAR TODO
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Navegación de pestañas en la parte inferior -->
+  <nav class="nav-tabs">
+    <div class="nav-tab active" data-tab="ingredients">
+      <span class="material-icons">shopping_cart</span>
+      Ingredientes
+    </div>
+    <div class="nav-tab" data-tab="preparation">
+      <span class="material-icons">format_list_numbered</span>
+      Preparación
+    </div>
+    <div class="nav-tab" data-tab="photos">
+      <span class="material-icons">photo_camera</span>
+      Fotos
+    </div>
+    <div class="nav-tab" data-tab="logbook">
+      <span class="material-icons">book</span>
+      Bitácora
+    </div>
+    <div class="nav-tab" data-tab="result">
+      <span class="material-icons">assessment</span>
+      Resultado
+    </div>
+  </nav>
+
+  <script>
+    // Funcionalidad de las pestañas
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Desactivar todas las pestañas
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        // Activar la pestaña seleccionada
+        tab.classList.add('active');
+        const tabId = tab.getAttribute('data-tab') + '-tab';
+        document.getElementById(tabId).classList.add('active');
+        
+        // Animación para el contenido
+        document.getElementById(tabId).style.animation = 'scaleIn 0.3s ease-out forwards';
+      });
+    });
+    
+    // Gestión de ingredientes
+    let ingredients = [];
+    const addIngredientBtn = document.getElementById('add-ingredient');
+    const ingredientsList = document.getElementById('ingredients-list');
+    
+    // Verificar que los elementos existen
+    console.log('Elemento addIngredientBtn:', addIngredientBtn ? 'Encontrado' : 'NO ENCONTRADO');
+    console.log('Elemento ingredientsList:', ingredientsList ? 'Encontrado' : 'NO ENCONTRADO');
+    
+    // Recuperar ingredientes del almacenamiento local
+    const savedIngredients = localStorage.getItem('ingredients');
+    if (savedIngredients) {
+      ingredients = JSON.parse(savedIngredients);
+      updateIngredientsList();
+    }
+    
+    // Definir la función para agregar ingrediente
+    function addIngredient() {
+      console.log('Función addIngredient ejecutada');
+      const name = document.getElementById('ingredient-name').value;
+      const quantity = document.getElementById('ingredient-quantity').value;
+      const unit = document.getElementById('ingredient-unit').value;
+      const price = document.getElementById('ingredient-price').value;
+      
+      console.log('Valores del ingrediente:', { name, quantity, unit, price });
+      
+      if (name && quantity && price) {
+        const ingredient = {
+          id: Date.now(), // Usar timestamp como ID único
+          name,
+          quantity: parseFloat(quantity),
+          unit,
+          price: parseFloat(price)
+        };
+        
+        ingredients.push(ingredient);
+        updateIngredientsList();
+        saveIngredientsToStorage();
+        
+        // Limpiar formulario
+        document.getElementById('ingredient-name').value = '';
+        document.getElementById('ingredient-quantity').value = '';
+        document.getElementById('ingredient-price').value = '';
+        
+        // Mostrar mensaje de éxito
+        showToast('Ingrediente agregado');
+      } else {
+        // Mostrar mensaje de error
+        showToast('Por favor completa todos los campos', 'error');
+      }
+    }
+    
+    // Asignar el evento click al botón
+    if (addIngredientBtn) {
+      addIngredientBtn.addEventListener('click', addIngredient);
+      console.log('Evento click asignado a addIngredientBtn');
+    }
+    
+    function updateIngredientsList() {
+      ingredientsList.innerHTML = '';
+      
+      if (ingredients.length === 0) {
+        ingredientsList.innerHTML = '<p style="text-align:center; color:var(--text-secondary); padding:16px;">No hay ingredientes agregados</p>';
+        return;
+      }
+      
+      ingredients.forEach((ingredient, index) => {
+        const li = document.createElement('li');
+        li.className = 'list-item';
+        li.innerHTML = `
+          <div class="list-item-content">
+            <h4 class="list-item-title">${ingredient.name}</h4>
+            <p class="list-item-subtitle">
+              ${ingredient.quantity} ${ingredient.unit}
+              <span class="badge badge-price">S/${ingredient.price.toFixed(2)}</span>
+            </p>
+          </div>
+          <div class="list-item-actions">
+            <button class="btn-icon" onclick="editIngredient(${ingredient.id})">
+              <span class="material-icons">edit</span>
+            </button>
+            <button class="btn-icon" onclick="deleteIngredient(${ingredient.id})">
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+        `;
+        ingredientsList.appendChild(li);
+      });
+      
+      updateSummary();
+    }
+    
+    function saveIngredientsToStorage() {
+      localStorage.setItem('ingredients', JSON.stringify(ingredients));
+    }
+    
+    // Funciones globales para manipular ingredientes
+    window.deleteIngredient = function(id) {
+      ingredients = ingredients.filter(item => item.id !== id);
+      updateIngredientsList();
+      saveIngredientsToStorage();
+      showToast('Ingrediente eliminado');
+    };
+    
+    window.editIngredient = function(id) {
+      const ingredient = ingredients.find(item => item.id === id);
+      if (ingredient) {
+        document.getElementById('ingredient-name').value = ingredient.name;
+        document.getElementById('ingredient-quantity').value = ingredient.quantity;
+        document.getElementById('ingredient-unit').value = ingredient.unit;
+        document.getElementById('ingredient-price').value = ingredient.price;
+        
+        // Eliminar el ingrediente actual, luego se volverá a agregar al editar
+        deleteIngredient(id);
+        
+        // Scroll al formulario
+        document.getElementById('ingredient-name').scrollIntoView({behavior: 'smooth'});
+        document.getElementById('ingredient-name').focus();
+      }
+    };
+    
+    // Gestión de pasos
+    let steps = [];
+    const addStepButton = document.getElementById('add-step');
+    const stepsList = document.getElementById('steps-list');
+    
+    // Verificar que los elementos existen
+    console.log('Elemento addStepButton:', addStepButton ? 'Encontrado' : 'NO ENCONTRADO');
+    console.log('Elemento stepsList:', stepsList ? 'Encontrado' : 'NO ENCONTRADO');
+    
+    // Recuperar pasos del almacenamiento local
+    const savedSteps = localStorage.getItem('steps');
+    if (savedSteps) {
+      steps = JSON.parse(savedSteps);
+      updateStepsList();
+    }
+    
+    // Verificar si hay datos en localStorage cada vez que se carga la página
+    function checkLocalStorage() {
+      console.log('Verificando datos en localStorage:');
+      console.log('Ingredientes:', localStorage.getItem('ingredients') ? 'Encontrados' : 'No encontrados');
+      console.log('Pasos:', localStorage.getItem('steps') ? 'Encontrados' : 'No encontrados');
+      console.log('Fotos ANTES:', localStorage.getItem('before-photos-photos') ? 'Encontradas' : 'No encontradas');
+      console.log('Fotos DURANTE:', localStorage.getItem('during-photos-photos') ? 'Encontradas' : 'No encontradas');
+      console.log('Fotos DESPUÉS:', localStorage.getItem('after-photos-photos') ? 'Encontradas' : 'No encontradas');
+    }
+    
+    // Ejecutar verificación al cargar
+    checkLocalStorage();
+    
+    // Definir la función para agregar paso
+    function addStep() {
+      console.log('Función addStep ejecutada');
+      const stepText = document.getElementById('preparation-step').value;
+      
+      console.log('Texto del paso:', stepText);
+      
+      if (stepText) {
+        const step = {
+          id: Date.now(),
+          text: stepText
+        };
+        
+        steps.push(step);
+        updateStepsList();
+        saveStepsToStorage();
+        
+        // Limpiar formulario
+        document.getElementById('preparation-step').value = '';
+        
+        // Mostrar mensaje de éxito
+        showToast('Paso agregado');
+      } else {
+        // Mostrar mensaje de error
+        showToast('Por favor ingresa un texto para el paso', 'error');
+      }
+    }
+    
+    // Asignar el evento click al botón
+    if (addStepButton) {
+      addStepButton.addEventListener('click', addStep);
+      console.log('Evento click asignado a addStepButton');
+    }
+    
+    function updateStepsList() {
+      stepsList.innerHTML = '';
+      
+      if (steps.length === 0) {
+        stepsList.innerHTML = '<p style="text-align:center; color:var(--text-secondary); padding:16px;">No hay pasos agregados</p>';
+        return;
+      }
+      
+      steps.forEach((step, index) => {
+        const li = document.createElement('li');
+        li.className = 'list-item';
+        li.style.listStylePosition = 'inside';
+        li.innerHTML = `
+          <div class="list-item-content">
+            <div style="margin-left: 8px;">${step.text}</div>
+          </div>
+          <div class="list-item-actions">
+            <button class="btn-icon" onclick="editStep(${step.id})">
+              <span class="material-icons">edit</span>
+            </button>
+            <button class="btn-icon" onclick="deleteStep(${step.id})">
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+        `;
+        stepsList.appendChild(li);
+      });
+      
+      updateSummary();
+    }
+    
+    function saveStepsToStorage() {
+      localStorage.setItem('steps', JSON.stringify(steps));
+    }
+    
+    // Funciones globales para manipular pasos
+    window.deleteStep = function(id) {
+      steps = steps.filter(item => item.id !== id);
+      updateStepsList();
+      saveStepsToStorage();
+      showToast('Paso eliminado');
+    };
+    
+    window.editStep = function(id) {
+      const step = steps.find(item => item.id === id);
+      if (step) {
+        document.getElementById('preparation-step').value = step.text;
+        
+        // Eliminar el paso actual, luego se volverá a agregar al editar
+        deleteStep(id);
+        
+        // Scroll al formulario
+        document.getElementById('preparation-step').scrollIntoView({behavior: 'smooth'});
+        document.getElementById('preparation-step').focus();
+      }
+    };
+    
+    // Manejo de fotos con fecha, ubicación y numeración
+    function handleFileSelect(event, containerId) {
+      const files = event.target.files;
+      const container = document.getElementById(containerId);
+      
+      // Determinar qué categoría de fotos es (ANTES, DURANTE, DESPUÉS)
+      let categoryText = '';
+      let categoryPrefix = '';
+      
+      if (containerId === 'before-photos') {
+        categoryText = 'ANTES';
+        categoryPrefix = 'A';
+      } else if (containerId === 'during-photos') {
+        categoryText = 'DURANTE';
+        categoryPrefix = 'D';
+      } else if (containerId === 'after-photos') {
+        categoryText = 'DESPUÉS';
+        categoryPrefix = 'P';
+      }
+      
+      if (files.length > 0) {
+        showToast(`${files.length} foto(s) seleccionada(s) - ${categoryText}`);
+      }
+      
+      // Obtener la fecha y hora actual
+      const now = new Date();
+      const dateString = now.toLocaleDateString('es-PE');
+      const timeString = now.toLocaleTimeString('es-PE');
+      const dateTimeString = `${dateString} ${timeString}`;
+      
+      // Intentar obtener la ubicación
+      getLocation().then(locationText => {
+        // Contar las fotos existentes para la numeración
+        let existingPhotos = container.querySelectorAll('.photo-item').length;
+        
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const reader = new FileReader();
+          const photoNumber = existingPhotos + i + 1;
+          
+          reader.onload = function(e) {
+            // Crear elemento para la foto con toda la información
+            const div = document.createElement('div');
+            div.className = 'photo-item';
+            
+            // Estructura de la foto con metadatos
+            div.innerHTML = `
+              <div class="photo-number">${categoryPrefix}${photoNumber}</div>
+              <img src="${e.target.result}" alt="Foto ${categoryText} ${photoNumber}">
+              <div class="photo-info">
+                <div class="photo-date">${dateTimeString}</div>
+                <div class="photo-location">${locationText}</div>
+              </div>
+            `;
+            container.appendChild(div);
+            
+            // Guardar en localStorage con los metadatos
+            const photoData = {
+              src: e.target.result,
+              category: categoryText,
+              number: photoNumber,
+              prefix: categoryPrefix,
+              date: dateTimeString,
+              location: locationText
+            };
+            
+            savePhotoToStorage(containerId, photoData);
+          };
+          
+          reader.readAsDataURL(file);
+        }
+      }).catch(err => {
+        showToast('No se pudo obtener la ubicación, foto sin geolocalización', 'warning');
+        
+        // Continuar sin ubicación
+        let existingPhotos = container.querySelectorAll('.photo-item').length;
+        
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const reader = new FileReader();
+          const photoNumber = existingPhotos + i + 1;
+          
+          reader.onload = function(e) {
+            const div = document.createElement('div');
+            div.className = 'photo-item';
+            div.innerHTML = `
+              <div class="photo-number">${categoryPrefix}${photoNumber}</div>
+              <img src="${e.target.result}" alt="Foto ${categoryText} ${photoNumber}">
+              <div class="photo-info">
+                <div class="photo-date">${dateTimeString}</div>
+              </div>
+            `;
+            container.appendChild(div);
+            
+            // Guardar en localStorage sin ubicación
+            const photoData = {
+              src: e.target.result,
+              category: categoryText,
+              number: photoNumber,
+              prefix: categoryPrefix,
+              date: dateTimeString,
+              location: 'No disponible'
+            };
+            
+            savePhotoToStorage(containerId, photoData);
+          };
+          
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+    
+    // Función para obtener la ubicación del usuario
+    function getLocation() {
+      return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+          reject('Geolocalización no soportada en este dispositivo');
+          return;
+        }
+        
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            
+            // Intentar obtener el nombre de la ubicación mediante reverse geocoding
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`)
+              .then(response => response.json())
+              .then(data => {
+                let locationName = 'Ubicación desconocida';
+                
+                if (data && data.display_name) {
+                  // Extraer solo la parte relevante de la dirección
+                  const addressParts = data.display_name.split(',');
+                  locationName = addressParts.slice(0, 2).join(', ');
+                }
+                
+                resolve(locationName);
+              })
+              .catch(err => {
+                resolve(`Lat: ${latitude.toFixed(4)}, Lon: ${longitude.toFixed(4)}`);
+              });
+          },
+          error => {
+            reject('Error al obtener ubicación');
+          },
+          { 
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0
+          }
+        );
+      });
+    }
+    
+    const photoBefore = document.getElementById('photo-before');
+    if (photoBefore) {
+      photoBefore.addEventListener('change', function(e) {
+        console.log('Evento change en photo-before detectado');
+        handleFileSelect(e, 'before-photos');
+      });
+      console.log('Evento change asignado a photoBefore');
+    } else {
+      console.error('Elemento photo-before no encontrado');
+    }
+    
+    const photoDuring = document.getElementById('photo-during');
+    if (photoDuring) {
+      photoDuring.addEventListener('change', function(e) {
+        console.log('Evento change en photo-during detectado');
+        handleFileSelect(e, 'during-photos');
+      });
+      console.log('Evento change asignado a photoDuring');
+    } else {
+      console.error('Elemento photo-during no encontrado');
+    }
+    
+    const photoAfter = document.getElementById('photo-after');
+    if (photoAfter) {
+      photoAfter.addEventListener('change', function(e) {
+        console.log('Evento change en photo-after detectado');
+        handleFileSelect(e, 'after-photos');
+      });
+      console.log('Evento change asignado a photoAfter');
+    } else {
+      console.error('Elemento photo-after no encontrado');
+    }
+    
+    // Guardar fotos en localStorage con metadatos
+    function savePhotoToStorage(containerId, photoData) {
+      const storageKey = containerId + '-photos';
+      let photos = JSON.parse(localStorage.getItem(storageKey) || '[]');
+      photos.push(photoData);
+      localStorage.setItem(storageKey, JSON.stringify(photos));
+      
+      // Verificar que se guardó correctamente
+      const savedPhotos = JSON.parse(localStorage.getItem(storageKey) || '[]');
+      if (savedPhotos.length === photos.length) {
+        console.log(`Foto guardada exitosamente en ${storageKey}. Total: ${photos.length}`);
+      } else {
+        console.error(`Error al guardar foto en ${storageKey}`);
+      }
+    }
+    
+    // Cargar fotos guardadas con metadatos
+    function loadSavedPhotos() {
+      const containers = ['before-photos', 'during-photos', 'after-photos'];
+      
+      containers.forEach(containerId => {
+        const storageKey = containerId + '-photos';
+        const photos = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        const container = document.getElementById(containerId);
+        
+        photos.forEach((photo, index) => {
+          const div = document.createElement('div');
+          div.className = 'photo-item';
+          
+          // Comprobar si es el formato antiguo (string) o el nuevo (objeto)
+          if (typeof photo === 'string') {
+            // Formato antiguo - solo URL
+            div.innerHTML = `<img src="${photo}" alt="Foto">`;
+          } else {
+            // Formato nuevo con metadatos
+            div.innerHTML = `
+              <div class="photo-number">${photo.prefix || ''}${photo.number || index+1}</div>
+              <img src="${photo.src}" alt="Foto ${photo.category || ''} ${photo.number || index+1}">
+              <div class="photo-info">
+                <div class="photo-date">${photo.date || 'Sin fecha'}</div>
+                ${photo.location ? `<div class="photo-location">${photo.location}</div>` : ''}
+              </div>
+            `;
+          }
+          
+          container.appendChild(div);
+        });
+      });
+    }
+    
+    // Ejecutar al cargar
+    loadSavedPhotos();
+    
+    // Verificar si se cargaron correctamente las fotos
+    function verificarCargaFotos() {
+      const containers = ['before-photos', 'during-photos', 'after-photos'];
+      containers.forEach(containerId => {
+        const storageKey = containerId + '-photos';
+        const photos = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        const elementosDOM = document.getElementById(containerId).querySelectorAll('.photo-item').length;
+        console.log(`${containerId}: ${photos.length} fotos en localStorage, ${elementosDOM} elementos en DOM`);
+        if (photos.length > 0 && elementosDOM !== photos.length) {
+          console.warn(`Discrepancia en ${containerId}: ${photos.length} en localStorage vs ${elementosDOM} en DOM`);
+        }
+      });
+    }
+    setTimeout(verificarCargaFotos, 1000);
+    
+    // Guardar descripciones
+    const saveButtons = ['save-before', 'save-during', 'save-after'];
+    
+    saveButtons.forEach(buttonId => {
+      document.getElementById(buttonId).addEventListener('click', function() {
+        const descriptionId = buttonId.replace('save-', 'description-');
+        const description = document.getElementById(descriptionId).value;
+        localStorage.setItem(descriptionId, description);
+        showToast('Descripción guardada');
+      });
+    });
+    
+    // Cargar descripciones guardadas
+    function loadSavedDescriptions() {
+      const descriptionIds = ['description-before', 'description-during', 'description-after'];
+      
+      descriptionIds.forEach(id => {
+        const description = localStorage.getItem(id);
+        if (description) {
+          document.getElementById(id).value = description;
+        }
+      });
+    }
+    
+    // Ejecutar al cargar
+    loadSavedDescriptions();
+    
+    // Título de la receta
+    const recipeTitle = document.getElementById('recipe-title');
+    recipeTitle.value = localStorage.getItem('recipe-title') || '';
+    
+    recipeTitle.addEventListener('input', () => {
+      localStorage.setItem('recipe-title', recipeTitle.value);
+      updateSummary();
+    });
+    
+    // Actualizar resumen
+    function updateSummary() {
+      // Título
+      document.getElementById('summary-title').textContent = 
+        document.getElementById('recipe-title').value || '-';
+      
+      // Ingredientes
+      document.getElementById('summary-ingredients').textContent = ingredients.length;
+      
+      // Pasos
+      document.getElementById('summary-steps').textContent = steps.length;
+      
+      // Costo total
+      const totalCost = ingredients.reduce((sum, item) => sum + item.price, 0);
+      document.getElementById('summary-cost').textContent = `S/${totalCost.toFixed(2)}`;
+      
+      // Precio sugerido (30% de margen)
+      const suggestedPrice = totalCost * 1.3;
+      document.getElementById('suggested-price').textContent = `S/${suggestedPrice.toFixed(2)}`;
+    }
+    
+    // Generar PDF
+    document.getElementById('generate-pdf').addEventListener('click', function() {
+      showToast('Generando PDF...', 'info');
+      
+      // Contenido a incluir en el PDF
+      const pdfContent = {
+        title: document.getElementById('recipe-title').value || 'Receta sin título',
+        ingredients: ingredients,
+        steps: steps,
+        cost: ingredients.reduce((sum, item) => sum + item.price, 0),
+        suggestedPrice: ingredients.reduce((sum, item) => sum + item.price, 0) * 1.3,
+        logbookEntries: logbookEntries,
+        equilibriumUnits: document.getElementById('punto-equilibrio-unidades').textContent,
+        equilibriumIncome: document.getElementById('punto-equilibrio-ingresos').textContent
+      };
+      
+      console.log('Contenido para PDF:', pdfContent);
+      
+      setTimeout(() => {
+        showToast('Esta función requiere bibliotecas adicionales. Se implementará la generación de PDF con todos los datos incluidos.', 'info');
+      }, 2000);
+    });
+    
+    // Compartir receta
+    document.getElementById('share-recipe').addEventListener('click', function() {
+      if (navigator.share) {
+        navigator.share({
+          title: document.getElementById('recipe-title').value || 'Mi Receta',
+          text: 'Mira esta receta que creé con Recetas Chef',
+          // url: window.location.href
+        })
+        .then(() => showToast('¡Receta compartida!'))
+        .catch((error) => showToast('Error al compartir', 'error'));
+      } else {
+        showToast('Compartir no disponible en este dispositivo', 'info');
+      }
+    });
+    
+    // Sistema de notificaciones Toast mejorado
+    function showToast(message, type = 'success') {
+      // Crear elemento toast
+      const toast = document.createElement('div');
+      toast.className = 'toast toast-' + type;
+      
+      // Agregar icono según el tipo de mensaje
+      let icon = 'check_circle';
+      if (type === 'error') icon = 'error';
+      if (type === 'info') icon = 'info';
+      if (type === 'warning') icon = 'warning';
+      
+      toast.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="material-icons">${icon}</span>
+          <span>${message}</span>
+        </div>
+      `;
+      
+      // Estilos para el toast
+      toast.style.position = 'fixed';
+      toast.style.bottom = '70px';
+      toast.style.left = '50%';
+      toast.style.transform = 'translateX(-50%)';
+      toast.style.backgroundColor = type === 'success' ? '#4CAF50' : 
+                                   type === 'error' ? '#F44336' : 
+                                   type === 'warning' ? '#FF9800' : '#2196F3';
+      toast.style.color = 'white';
+      toast.style.padding = '12px 20px';
+      toast.style.borderRadius = '8px';
+      toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+      toast.style.zIndex = '1000';
+      toast.style.minWidth = '280px';
+      toast.style.maxWidth = '80%';
+      toast.style.textAlign = 'left';
+      toast.style.animation = 'fadeIn 0.3s ease-out';
+      toast.style.fontWeight = '500';
+      
+      // Agregar al DOM
+      document.body.appendChild(toast);
+      
+      // Efecto de entrada
+      toast.animate([
+        { transform: 'translateX(-50%) translateY(20px)', opacity: 0 },
+        { transform: 'translateX(-50%) translateY(0)', opacity: 1 }
+      ], {
+        duration: 300,
+        easing: 'ease-out'
+      });
+      
+      // Eliminar después de 3 segundos
+      setTimeout(() => {
+        // Efecto de salida
+        const animation = toast.animate([
+          { transform: 'translateX(-50%) translateY(0)', opacity: 1 },
+          { transform: 'translateX(-50%) translateY(-20px)', opacity: 0 }
+        ], {
+          duration: 300,
+          easing: 'ease-in'
+        });
+        
+        animation.onfinish = () => {
+          document.body.removeChild(toast);
+        };
+      }, 3000);
+    }
+    
+    // Función para resetear todos los datos
+    function resetAllData() {
+      // Mostrar confirmación
+      if (confirm('¿Estás seguro que deseas borrar TODOS los datos? Esta acción no se puede deshacer.')) {
+        // Borrar ingredientes
+        ingredients = [];
+        updateIngredientsList();
+        saveIngredientsToStorage();
+        
+        // Borrar pasos
+        steps = [];
+        updateStepsList();
+        saveStepsToStorage();
+        
+        // Borrar bitácora
+        logbookEntries = [];
+        updateLogbookEntriesList();
+        localStorage.removeItem('logbook-entries');
+        
+        // Borrar título
+        document.getElementById('recipe-title').value = '';
+        localStorage.removeItem('recipe-title');
+        
+        // Borrar fotos
+        const photoContainers = ['before-photos', 'during-photos', 'after-photos'];
+        photoContainers.forEach(containerId => {
+          document.getElementById(containerId).innerHTML = '';
+          localStorage.removeItem(containerId + '-photos');
+        });
+        
+        // Borrar descripciones
+        const descriptionIds = ['description-before', 'description-during', 'description-after'];
+        descriptionIds.forEach(id => {
+          document.getElementById(id).value = '';
+          localStorage.removeItem(id);
+        });
+        
+        // Borrar punto de equilibrio
+        document.getElementById('costos-fijos').value = '';
+        document.getElementById('costo-unitario-extra').value = '';
+        document.getElementById('precio-venta').value = '';
+        document.getElementById('punto-equilibrio-unidades').textContent = '0';
+        document.getElementById('punto-equilibrio-ingresos').textContent = 'S/0.00';
+        localStorage.removeItem('costos-fijos');
+        localStorage.removeItem('costo-unitario-extra');
+        localStorage.removeItem('precio-venta');
+        
+        // Actualizar resumen
+        updateSummary();
+        
+        showToast('Todos los datos han sido borrados', 'info');
+      }
+    }
+    
+    // Asignar la función a ambos botones de borrado
+    document.getElementById('reset-all').addEventListener('click', resetAllData);
+    document.getElementById('reset-all-header').addEventListener('click', resetAllData);
+    
+    // La siguiente función ya no es necesaria porque se ha reemplazado por resetAllData
+    // document.getElementById('reset-all').addEventListener('click', function() {
+    // Comentario: Código eliminado y trasladado a la función resetAllData
+    
+    // Gestión de la bitácora
+    let logbookEntries = [];
+    const addLogbookEntryButton = document.getElementById('add-logbook-entry');
+    const logbookEntriesList = document.getElementById('logbook-entries-list');
+    
+    // Recuperar entradas de bitácora del almacenamiento local
+    const savedLogbookEntries = localStorage.getItem('logbook-entries');
+    if (savedLogbookEntries) {
+      logbookEntries = JSON.parse(savedLogbookEntries);
+      updateLogbookEntriesList();
+    }
+    
+    // Definir la función para agregar entrada de bitácora
+    function addLogbookEntry() {
+      console.log('Función addLogbookEntry ejecutada');
+      
+      const date = document.getElementById('logbook-date').value;
+      const title = document.getElementById('logbook-title').value;
+      const category = document.getElementById('logbook-category').value;
+      const text = document.getElementById('logbook-text').value;
+      
+      if (date && title && text) {
+        const entry = {
+          id: Date.now(),
+          date,
+          title,
+          category,
+          text
+        };
+        
+        logbookEntries.push(entry);
+        updateLogbookEntriesList();
+        saveLogbookEntriesToStorage();
+        
+        // Limpiar formulario
+        document.getElementById('logbook-title').value = '';
+        document.getElementById('logbook-text').value = '';
+        
+        // Mostrar mensaje de éxito
+        showToast('Anotación agregada a la bitácora');
+      } else {
+        // Mostrar mensaje de error
+        showToast('Por favor completa todos los campos requeridos', 'error');
+      }
+    }
+    
+    // Asignar el evento click al botón
+    if (addLogbookEntryButton) {
+      addLogbookEntryButton.addEventListener('click', addLogbookEntry);
+      console.log('Evento click asignado a addLogbookEntryButton');
+    }
+    
+    function updateLogbookEntriesList() {
+      logbookEntriesList.innerHTML = '';
+      
+      if (logbookEntries.length === 0) {
+        logbookEntriesList.innerHTML = '<p style="text-align:center; color:var(--text-secondary); padding:16px;">No hay anotaciones en la bitácora</p>';
+        return;
+      }
+      
+      // Ordenar por fecha, más reciente primero
+      const sortedEntries = [...logbookEntries].sort((a, b) => new Date(b.date) - new Date(a.date));
+      
+      sortedEntries.forEach((entry) => {
+        const li = document.createElement('li');
+        li.className = 'list-item';
+        
+        // Obtener el nombre de la categoría
+        let categoryName = '';
+        switch(entry.category) {
+          case 'materiales': categoryName = 'Materiales/Ingredientes'; break;
+          case 'equipo': categoryName = 'Equipo de trabajo'; break;
+          case 'proceso': categoryName = 'Proceso de preparación'; break;
+          case 'cliente': categoryName = 'Cliente/Requisitos'; break;
+          default: categoryName = 'Otro';
+        }
+        
+        // Formato de fecha más amigable
+        const formattedDate = new Date(entry.date).toLocaleDateString('es-ES', {
+          day: '2-digit', month: '2-digit', year: 'numeric'
+        });
+        
+        li.innerHTML = `
+          <div class="list-item-content">
+            <h4 class="list-item-title">${entry.title}</h4>
+            <p class="list-item-subtitle">
+              ${formattedDate} · <span style="color: var(--primary-color);">${categoryName}</span>
+            </p>
+            <p style="margin-top: 8px; white-space: pre-line;">${entry.text}</p>
+          </div>
+          <div class="list-item-actions">
+            <button class="btn-icon" onclick="editLogbookEntry(${entry.id})">
+              <span class="material-icons">edit</span>
+            </button>
+            <button class="btn-icon" onclick="deleteLogbookEntry(${entry.id})">
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+        `;
+        logbookEntriesList.appendChild(li);
+      });
+    }
+    
+    function saveLogbookEntriesToStorage() {
+      localStorage.setItem('logbook-entries', JSON.stringify(logbookEntries));
+    }
+    
+    // Funciones globales para manipular entradas de bitácora
+    window.deleteLogbookEntry = function(id) {
+      logbookEntries = logbookEntries.filter(item => item.id !== id);
+      updateLogbookEntriesList();
+      saveLogbookEntriesToStorage();
+      showToast('Anotación eliminada');
+    };
+    
+    window.editLogbookEntry = function(id) {
+      const entry = logbookEntries.find(item => item.id === id);
+      if (entry) {
+        document.getElementById('logbook-date').value = entry.date;
+        document.getElementById('logbook-title').value = entry.title;
+        document.getElementById('logbook-category').value = entry.category;
+        document.getElementById('logbook-text').value = entry.text;
+        
+        // Eliminar la entrada actual, luego se volverá a agregar al editar
+        deleteLogbookEntry(id);
+        
+        // Scroll al formulario
+        document.getElementById('logbook-title').scrollIntoView({behavior: 'smooth'});
+        document.getElementById('logbook-title').focus();
+      }
+    };
+    
+    // Cálculo del punto de equilibrio
+    document.getElementById('calcular-equilibrio').addEventListener('click', function() {
+      const costosFijos = parseFloat(document.getElementById('costos-fijos').value) || 0;
+      const costoUnitarioExtra = parseFloat(document.getElementById('costo-unitario-extra').value) || 0;
+      const precioVenta = parseFloat(document.getElementById('precio-venta').value) || 0;
+      
+      // Obtener el costo total de ingredientes (costo variable)
+      const costoIngredientes = ingredients.reduce((sum, item) => sum + item.price, 0);
+      
+      // Costo variable total
+      const costoVariable = costoIngredientes + costoUnitarioExtra;
+      
+      if (costosFijos > 0 && precioVenta > costoVariable) {
+        // Calcular punto de equilibrio
+        const unidadesEquilibrio = Math.ceil(costosFijos / (precioVenta - costoVariable));
+        const ingresosEquilibrio = unidadesEquilibrio * precioVenta;
+        
+        // Mostrar resultados
+        document.getElementById('punto-equilibrio-unidades').textContent = unidadesEquilibrio;
+        document.getElementById('punto-equilibrio-ingresos').textContent = `S/${ingresosEquilibrio.toFixed(2)}`;
+        
+        // Guardar en localStorage
+        localStorage.setItem('costos-fijos', costosFijos);
+        localStorage.setItem('costo-unitario-extra', costoUnitarioExtra);
+        localStorage.setItem('precio-venta', precioVenta);
+        
+        showToast('Punto de equilibrio calculado');
+      } else {
+        showToast('Verifica los valores ingresados. El precio de venta debe ser mayor al costo variable', 'error');
+      }
+    });
+    
+    // Cargar datos guardados del punto de equilibrio
+    if (localStorage.getItem('costos-fijos')) {
+      document.getElementById('costos-fijos').value = localStorage.getItem('costos-fijos');
+    }
+    
+    if (localStorage.getItem('costo-unitario-extra')) {
+      document.getElementById('costo-unitario-extra').value = localStorage.getItem('costo-unitario-extra');
+    }
+    
+    if (localStorage.getItem('precio-venta')) {
+      document.getElementById('precio-venta').value = localStorage.getItem('precio-venta');
+    }
+    
+    // Establecer la fecha de hoy en el campo de fecha de la bitácora
+    document.getElementById('logbook-date').valueAsDate = new Date();
+    
+    // Inicialización
+    updateSummary();
+    
+    // Mostrar mensajes informativos al usuario
+    setTimeout(() => {
+      showToast('Todos tus cambios se guardan automáticamente', 'info');
+      
+      // Mensaje sobre el botón de borrado
+      setTimeout(() => {
+        showToast('Usa el botón "Borrar Todo" para iniciar un nuevo proyecto', 'info');
+      }, 3000);
+    }, 1500);
+    
+    // Registrar Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        // Primero intentamos actualizar y desregistrar cualquier Service Worker existente
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            console.log('Actualizando Service Worker anterior...');
+            registration.update();
+          }
+        });
+
+        // Registramos el Service Worker con un pequeño retraso
+        setTimeout(() => {
+          navigator.serviceWorker.register('./service-worker.js').then(function(registration) {
+            console.log('Service Worker registrado con éxito:', registration.scope);
+          }).catch(function(err) {
+            console.log('Error al registrar Service Worker:', err);
+          });
+        }, 1000);
+      });
+      
+      // Función para actualizar la página y forzar la recarga del caché
+      function updateApp() {
+        if (confirm('¿Quieres actualizar la aplicación a la última versión?')) {
+          // Limpiar todas las cachés
+          if ('caches' in window) {
+            caches.keys().then(function(cacheNames) {
+              return Promise.all(
+                cacheNames.map(function(cacheName) {
+                  console.log('Eliminando caché:', cacheName);
+                  return caches.delete(cacheName);
+                })
+              );
+            }).then(() => {
+              console.log('Todas las cachés eliminadas');
+              window.location.reload(true); // Recargar forzando nueva petición al servidor
+            });
+          } else {
+            window.location.reload(true);
+          }
+        }
+      }
+      
+      // Agregar botón de actualización
+      const updateButton = document.createElement('button');
+      updateButton.className = 'btn';
+      updateButton.style = 'position: fixed; bottom: 80px; right: 20px; z-index: 999; background-color: #2196F3; color: white; border-radius: 50%; width: 56px; height: 56px; box-shadow: 0 3px 5px rgba(0,0,0,0.3);';
+      updateButton.innerHTML = '<span class="material-icons">refresh</span>';
+      updateButton.onclick = updateApp;
+      document.body.appendChild(updateButton);
+    }
+  </script>
+</body>
+</html>

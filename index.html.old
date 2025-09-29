@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#8e2025">
+  <title>Gestor de Recetas - Versión Web</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icon.png" type="image/png">
+  <style>
+    /* Estilos básicos */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    
+    header {
+      background-color: #8e2025;
+      color: white;
+      padding: 16px;
+      text-align: center;
+    }
+    
+    h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    button {
+      background-color: #8e2025;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-top: 10px;
+    }
+    
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    
+    .nav-tabs {
+      display: flex;
+      margin-bottom: 16px;
+      overflow-x: auto;
+      background: white;
+      border-radius: 8px;
+    }
+    
+    .nav-tab {
+      flex: 1;
+      text-align: center;
+      padding: 12px 8px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    
+    .nav-tab.active {
+      border-bottom: 2px solid #8e2025;
+      color: #8e2025;
+      font-weight: bold;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .ingredient-list, .step-list {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .ingredient-item, .step-item {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .btn-icon {
+      background: none;
+      border: none;
+      color: #555;
+      cursor: pointer;
+      padding: 5px;
+      margin: 0;
+    }
+    
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 8px;
+      margin-top: 16px;
+    }
+    
+    .photo-item {
+      aspect-ratio: 1;
+      overflow: hidden;
+      border-radius: 4px;
+      background-color: #eee;
+    }
+    
+    .photo-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Gestor de Recetas</h1>
+    <input type="text" id="recipe-title" placeholder="Nombre de la receta..." style="margin-top: 10px; max-width: 400px;">
+  </header>
+  
+  <div class="container">
+    <div class="nav-tabs">
+      <div class="nav-tab active" data-tab="ingredients">Ingredientes</div>
+      <div class="nav-tab" data-tab="preparation">Preparación</div>
+      <div class="nav-tab" data-tab="photos">Fotos</div>
+      <div class="nav-tab" data-tab="result">Resultado</div>
+    </div>
+    
+    <!-- Tab: Ingredientes -->
+    <div class="tab-content active" id="ingredients-tab">
+      <div class="card">
+        <h2>Ingredientes</h2>
+        <div>
+          <input type="text" id="ingredient-name" placeholder="Nombre del ingrediente">
+          <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <input type="number" id="ingredient-quantity" placeholder="Cantidad" style="flex: 1;">
+            <select id="ingredient-unit" style="flex: 1;">
+              <option value="g">gramos</option>
+              <option value="kg">kilogramos</option>
+              <option value="ml">mililitros</option>
+              <option value="l">litros</option>
+              <option value="unidad">unidad</option>
+              <option value="cucharada">cucharada</option>
+            </select>
+          </div>
+          <input type="number" id="ingredient-price" placeholder="Precio">
+          <button id="add-ingredient">Agregar Ingrediente</button>
+        </div>
+        
+        <ul class="ingredient-list" id="ingredients-list">
+          <!-- Los ingredientes se agregarán aquí -->
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Tab: Preparación -->
+    <div class="tab-content" id="preparation-tab">
+      <div class="card">
+        <h2>Preparación</h2>
+        <div>
+          <textarea id="preparation-step" rows="3" placeholder="Describe el paso..."></textarea>
+          <button id="add-step">Agregar Paso</button>
+        </div>
+        
+        <ol class="step-list" id="steps-list">
+          <!-- Los pasos se agregarán aquí -->
+        </ol>
+      </div>
+    </div>
+    
+    <!-- Tab: Fotos -->
+    <div class="tab-content" id="photos-tab">
+      <div class="card">
+        <h2>Antes de la preparación</h2>
+        <input type="file" id="photo-before" accept="image/*" multiple>
+        <textarea id="description-before" rows="2" placeholder="Describe las fotos..."></textarea>
+        <button id="save-before">Guardar descripción</button>
+        <div class="photo-grid" id="before-photos">
+          <!-- Las fotos se mostrarán aquí -->
+        </div>
+      </div>
+      
+      <div class="card">
+        <h2>Durante la preparación</h2>
+        <input type="file" id="photo-during" accept="image/*" multiple>
+        <textarea id="description-during" rows="2" placeholder="Describe las fotos..."></textarea>
+        <button id="save-during">Guardar descripción</button>
+        <div class="photo-grid" id="during-photos">
+          <!-- Las fotos se mostrarán aquí -->
+        </div>
+      </div>
+      
+      <div class="card">
+        <h2>Después de la preparación</h2>
+        <input type="file" id="photo-after" accept="image/*" multiple>
+        <textarea id="description-after" rows="2" placeholder="Describe las fotos..."></textarea>
+        <button id="save-after">Guardar descripción</button>
+        <div class="photo-grid" id="after-photos">
+          <!-- Las fotos se mostrarán aquí -->
+        </div>
+      </div>
+    </div>
+    
+    <!-- Tab: Resultado -->
+    <div class="tab-content" id="result-tab">
+      <div class="card">
+        <h2>Resultado Final</h2>
+        
+        <div>
+          <h3>Resumen de la receta</h3>
+          <p><strong>Título:</strong> <span id="summary-title">-</span></p>
+          <p><strong>Ingredientes:</strong> <span id="summary-ingredients">0</span></p>
+          <p><strong>Pasos:</strong> <span id="summary-steps">0</span></p>
+          <p><strong>Costo total:</strong> <span id="summary-cost">$0.00</span></p>
+          <p><strong>Precio sugerido:</strong> <span id="suggested-price">$0.00</span></p>
+        </div>
+        
+        <button id="generate-pdf">Generar PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Funcionalidad básica para las pestañas
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Desactivar todas las pestañas
+        document.querySelectorAll('.nav-tab').forEach(t => {
+          t.classList.remove('active');
+        });
+        document.querySelectorAll('.tab-content').forEach(c => {
+          c.classList.remove('active');
+        });
+        
+        // Activar la pestaña seleccionada
+        tab.classList.add('active');
+        const tabId = tab.getAttribute('data-tab') + '-tab';
+        document.getElementById(tabId).classList.add('active');
+      });
+    });
+    
+    // Ingredientes
+    let ingredients = [];
+    const ingredientForm = document.getElementById('add-ingredient');
+    const ingredientsList = document.getElementById('ingredients-list');
+    
+    ingredientForm.addEventListener('click', () => {
+      const name = document.getElementById('ingredient-name').value;
+      const quantity = document.getElementById('ingredient-quantity').value;
+      const unit = document.getElementById('ingredient-unit').value;
+      const price = document.getElementById('ingredient-price').value;
+      
+      if (name && quantity && price) {
+        const ingredient = {
+          name,
+          quantity: parseFloat(quantity),
+          unit,
+          price: parseFloat(price)
+        };
+        
+        ingredients.push(ingredient);
+        updateIngredientsList();
+        
+        // Limpiar formulario
+        document.getElementById('ingredient-name').value = '';
+        document.getElementById('ingredient-quantity').value = '';
+        document.getElementById('ingredient-price').value = '';
+      }
+    });
+    
+    function updateIngredientsList() {
+      ingredientsList.innerHTML = '';
+      
+      ingredients.forEach((ingredient, index) => {
+        const li = document.createElement('li');
+        li.className = 'ingredient-item';
+        li.innerHTML = `
+          <div>
+            <strong>${ingredient.name}</strong>: 
+            ${ingredient.quantity} ${ingredient.unit} - $${ingredient.price.toFixed(2)}
+          </div>
+          <div class="actions">
+            <button class="btn-icon" onclick="editIngredient(${index})">✏️</button>
+            <button class="btn-icon" onclick="deleteIngredient(${index})">🗑️</button>
+          </div>
+        `;
+        ingredientsList.appendChild(li);
+      });
+      
+      updateSummary();
+    }
+    
+    // Función global para eliminar ingredientes
+    window.deleteIngredient = function(index) {
+      ingredients.splice(index, 1);
+      updateIngredientsList();
+    };
+    
+    window.editIngredient = function(index) {
+      const ingredient = ingredients[index];
+      document.getElementById('ingredient-name').value = ingredient.name;
+      document.getElementById('ingredient-quantity').value = ingredient.quantity;
+      document.getElementById('ingredient-unit').value = ingredient.unit;
+      document.getElementById('ingredient-price').value = ingredient.price;
+      
+      // Eliminar el ingrediente actual, luego se volverá a agregar al editar
+      deleteIngredient(index);
+    };
+    
+    // Pasos de preparación
+    let steps = [];
+    const addStepButton = document.getElementById('add-step');
+    const stepsList = document.getElementById('steps-list');
+    
+    addStepButton.addEventListener('click', () => {
+      const stepText = document.getElementById('preparation-step').value;
+      
+      if (stepText) {
+        steps.push(stepText);
+        updateStepsList();
+        
+        // Limpiar formulario
+        document.getElementById('preparation-step').value = '';
+      }
+    });
+    
+    function updateStepsList() {
+      stepsList.innerHTML = '';
+      
+      steps.forEach((step, index) => {
+        const li = document.createElement('li');
+        li.className = 'step-item';
+        li.innerHTML = `
+          <div>${step}</div>
+          <div class="actions">
+            <button class="btn-icon" onclick="editStep(${index})">✏️</button>
+            <button class="btn-icon" onclick="deleteStep(${index})">🗑️</button>
+          </div>
+        `;
+        stepsList.appendChild(li);
+      });
+      
+      updateSummary();
+    }
+    
+    // Funciones globales para manipular pasos
+    window.deleteStep = function(index) {
+      steps.splice(index, 1);
+      updateStepsList();
+    };
+    
+    window.editStep = function(index) {
+      const step = steps[index];
+      document.getElementById('preparation-step').value = step;
+      
+      // Eliminar el paso actual, luego se volverá a agregar al editar
+      deleteStep(index);
+    };
+    
+    // Manejo de fotos
+    function handleFileSelect(event, containerId) {
+      const files = event.target.files;
+      const container = document.getElementById(containerId);
+      
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          const div = document.createElement('div');
+          div.className = 'photo-item';
+          div.innerHTML = `<img src="${e.target.result}" alt="Foto">`;
+          container.appendChild(div);
+        };
+        
+        reader.readAsDataURL(file);
+      }
+    }
+    
+    document.getElementById('photo-before').addEventListener('change', function(e) {
+      handleFileSelect(e, 'before-photos');
+    });
+    
+    document.getElementById('photo-during').addEventListener('change', function(e) {
+      handleFileSelect(e, 'during-photos');
+    });
+    
+    document.getElementById('photo-after').addEventListener('change', function(e) {
+      handleFileSelect(e, 'after-photos');
+    });
+    
+    // Guardar descripciones
+    document.getElementById('save-before').addEventListener('click', function() {
+      alert('Descripción guardada');
+    });
+    
+    document.getElementById('save-during').addEventListener('click', function() {
+      alert('Descripción guardada');
+    });
+    
+    document.getElementById('save-after').addEventListener('click', function() {
+      alert('Descripción guardada');
+    });
+    
+    // Actualizar resumen
+    function updateSummary() {
+      // Título
+      document.getElementById('summary-title').textContent = 
+        document.getElementById('recipe-title').value || '-';
+      
+      // Ingredientes
+      document.getElementById('summary-ingredients').textContent = ingredients.length;
+      
+      // Pasos
+      document.getElementById('summary-steps').textContent = steps.length;
+      
+      // Costo total
+      const totalCost = ingredients.reduce((sum, item) => sum + item.price, 0);
+      document.getElementById('summary-cost').textContent = `$${totalCost.toFixed(2)}`;
+      
+      // Precio sugerido (30% de margen)
+      const suggestedPrice = totalCost * 1.3;
+      document.getElementById('suggested-price').textContent = `$${suggestedPrice.toFixed(2)}`;
+    }
+    
+    // Título de la receta
+    document.getElementById('recipe-title').addEventListener('input', updateSummary);
+    
+    // Generar PDF
+    document.getElementById('generate-pdf').addEventListener('click', function() {
+      alert('Esta es una versión simplificada. La generación de PDF requiere bibliotecas adicionales que se implementarán más adelante.');
+    });
+    
+    // Inicialización
+    updateSummary();
+    
+    // Registrar Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./service-worker.js').then(function(registration) {
+          console.log('Service Worker registrado con éxito:', registration.scope);
+        }).catch(function(err) {
+          console.log('Error al registrar Service Worker:', err);
+        });
+      });
+    }
+  </script>
+</body>
+</html>

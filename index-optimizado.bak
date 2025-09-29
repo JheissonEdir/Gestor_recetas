@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#FF5252">
+  <title>Recetas Chef Perú - Versión Optimizada</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    /* Variables */
+    :root {
+      --primary-color: #FF5252;
+      --primary-dark: #C50E29;
+      --primary-light: #FF867F;
+      --secondary-color: #4CAF50;
+      --background-color: #F9F9F9;
+      --surface-color: #FFFFFF;
+      --text-color: #333333;
+      --text-secondary: #757575;
+      --border-radius: 12px;
+      --shadow: 0 4px 6px rgba(0,0,0,0.1);
+      --transition: all 0.3s ease;
+    }
+    
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+    
+    /* Animaciones */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes scaleIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    
+    /* Header */
+    .app-header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 16px 20px;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .app-title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .app-title .material-icons {
+      font-size: 28px;
+    }
+    
+    .recipe-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: var(--transition);
+    }
+    
+    .recipe-input:focus {
+      outline: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    /* Contenedor principal */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 16px;
+      padding-bottom: 80px; /* Espacio para el menú inferior */
+    }
+    
+    /* Tarjetas */
+    .card {
+      background-color: var(--surface-color);
+      border-radius: var(--border-radius);
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      color: var(--primary-color);
+      font-weight: 600;
+      font-size: 20px;
+    }
+    
+    /* Formularios */
+    .form-group {
+      margin-bottom: 16px;
+    }
+    
+    .input-label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    
+    .text-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #e0e0e0;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      font-family: 'Poppins', sans-serif;
+      transition: var(--transition);
+    }
+    
+    .text-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(255,82,82,0.2);
+    }
+    
+    .protected-input {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23FF5252' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'%3E%3C/path%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: calc(100% - 10px) 10px;
+      background-size: 18px;
+      padding-right: 36px;
+      border-left: 3px solid #FF5252;
+    }
+    
+    .input-row {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .input-row > * {
+      flex: 1;
+    }
+    
+    select.text-input {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23757575' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
+      padding-right: 36px;
+      appearance: none;
+    }
+    
+    /* Botones */
+    .btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      font-weight: 500;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      box-shadow: 0 4px 8px rgba(197,14,41,0.3);
+    }
+    
+    .btn-primary:active {
+      transform: translateY(1px);
+    }
+    
+    .btn-secondary {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+    
+    .btn-block {
+      width: 100%;
+    }
+    
+    /* Contenido de pestañas */
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    /* Navegación de pestañas inferior */
+    .nav-tabs {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      background-color: var(--surface-color);
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      z-index: 10;
+    }
+    
+    .nav-tab {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 8px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+      font-size: 12px;
+    }
+    
+    .nav-tab .material-icons {
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+    
+    .nav-tab.active {
+      color: var(--primary-color);
+    }
+    
+    /* Toast notifications */
+    .toast {
+      position: fixed;
+      bottom: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 1000;
+      min-width: 280px;
+      max-width: 80%;
+      text-align: left;
+      animation: fadeIn 0.3s ease-out;
+      font-weight: 500;
+    }
+    
+    .toast-error {
+      background-color: #F44336;
+    }
+    
+    .toast-info {
+      background-color: #2196F3;
+    }
+    
+    .toast-warning {
+      background-color: #FF9800;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-content">
+      <h1 class="app-title">
+        <span class="material-icons">restaurant</span>
+        Recetas Chef Perú - Optimizada
+      </h1>
+      <input type="text" class="recipe-input" id="recipe-title" placeholder="Nombre de la receta...">
+    </div>
+    <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+      <button id="reset-all-header" class="btn" style="background-color: #F44336; color: white; padding: 8px 12px; font-size: 14px;">
+        <span class="material-icons" style="font-size: 16px;">delete_forever</span>
+        Borrar Todo
+      </button>
+    </div>
+  </header>
+  
+  <!-- Contenedor principal -->
+  <div class="container">
+    <!-- Contenido de la pestaña Ingredientes -->
+    <div class="tab-content active" id="ingredients-tab">
+      <div class="card">
+        <h2>Ingredientes</h2>
+        
+        <div class="form-group">
+          <label class="input-label" for="ingredient-name">Nombre del ingrediente</label>
+          <input type="text" class="text-input" id="ingredient-name" placeholder="Ej: Harina de trigo">
+        </div>
+        
+        <div class="form-group">
+          <div class="input-row">
+            <div>
+              <label class="input-label" for="ingredient-quantity">Cantidad</label>
+              <input type="number" class="text-input" id="ingredient-quantity" placeholder="Ej: 500">
+            </div>
+            <div>
+              <label class="input-label" for="ingredient-unit">Unidad</label>
+              <select class="text-input" id="ingredient-unit">
+                <option value="g">gramos (g)</option>
+                <option value="kg">kilogramos (kg)</option>
+                <option value="ml">mililitros (ml)</option>
+                <option value="l">litros (l)</option>
+                <option value="unidad">unidad(es)</option>
+                <option value="cucharada">cucharada(s)</option>
+                <option value="taza">taza(s)</option>
+                <option value="pizca">pizca(s)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="input-label" for="ingredient-price">Precio (S/)</label>
+          <input type="number" class="text-input" id="ingredient-price" placeholder="Ej: 25.50">
+        </div>
+        
+        <button class="btn btn-primary btn-block" id="add-ingredient" onclick="addIngredient()">
+          <span class="material-icons">add</span>
+          Agregar Ingrediente
+        </button>
+        
+        <div style="margin-top: 24px;">
+          <h3 style="color: var(--text-secondary); font-size: 16px; font-weight: 500;">Lista de ingredientes</h3>
+          <ul class="list" id="ingredients-list">
+            <!-- Los ingredientes se agregarán aquí mediante JavaScript -->
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Navegación de pestañas en la parte inferior -->
+  <nav class="nav-tabs">
+    <div class="nav-tab active" data-tab="ingredients">
+      <span class="material-icons">shopping_cart</span>
+      Ingredientes
+    </div>
+    <div class="nav-tab" data-tab="test">
+      <span class="material-icons">bug_report</span>
+      Test
+    </div>
+  </nav>
+
+  <script>
+    // Variables globales
+    let ingredients = [];
+    
+    // Función para mostrar toast notifications
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = 'toast' + (type !== 'success' ? ` toast-${type}` : '');
+      
+      // Agregar icono según el tipo de mensaje
+      let icon = 'check_circle';
+      if (type === 'error') icon = 'error';
+      if (type === 'info') icon = 'info';
+      if (type === 'warning') icon = 'warning';
+      
+      toast.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="material-icons">${icon}</span>
+          <span>${message}</span>
+        </div>
+      `;
+      
+      document.body.appendChild(toast);
+      
+      // Efecto de entrada
+      toast.animate([
+        { transform: 'translateX(-50%) translateY(20px)', opacity: 0 },
+        { transform: 'translateX(-50%) translateY(0)', opacity: 1 }
+      ], {
+        duration: 300,
+        easing: 'ease-out'
+      });
+      
+      // Eliminar después de 3 segundos
+      setTimeout(() => {
+        toast.animate([
+          { transform: 'translateX(-50%) translateY(0)', opacity: 1 },
+          { transform: 'translateX(-50%) translateY(-20px)', opacity: 0 }
+        ], {
+          duration: 300,
+          easing: 'ease-in'
+        }).onfinish = () => {
+          document.body.removeChild(toast);
+        };
+      }, 3000);
+    }
+
+    // Funcionalidad de las pestañas
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        console.log('Tab clicked:', tab.getAttribute('data-tab'));
+        
+        // Desactivar todas las pestañas
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        // Activar la pestaña seleccionada
+        tab.classList.add('active');
+        
+        if (tab.getAttribute('data-tab') === 'test') {
+          // Redirigir a la página de prueba
+          window.location.href = 'prueba-botones.html';
+          return;
+        }
+        
+        const tabId = tab.getAttribute('data-tab') + '-tab';
+        document.getElementById(tabId).classList.add('active');
+      });
+    });
+    
+    // Recuperar ingredientes del almacenamiento local
+    const savedIngredients = localStorage.getItem('ingredients');
+    if (savedIngredients) {
+      try {
+        ingredients = JSON.parse(savedIngredients);
+        updateIngredientsList();
+      } catch (e) {
+        console.error('Error al cargar ingredientes:', e);
+      }
+    }
+    
+    // Función para agregar ingrediente
+    function addIngredient() {
+      console.log('Función addIngredient ejecutada');
+      
+      const name = document.getElementById('ingredient-name').value;
+      const quantity = document.getElementById('ingredient-quantity').value;
+      const unit = document.getElementById('ingredient-unit').value;
+      const price = document.getElementById('ingredient-price').value;
+      
+      console.log('Valores del ingrediente:', { name, quantity, unit, price });
+      
+      if (name && quantity && price) {
+        const ingredient = {
+          id: Date.now(), // Usar timestamp como ID único
+          name,
+          quantity: parseFloat(quantity),
+          unit,
+          price: parseFloat(price)
+        };
+        
+        ingredients.push(ingredient);
+        updateIngredientsList();
+        saveIngredientsToStorage();
+        
+        // Limpiar formulario
+        document.getElementById('ingredient-name').value = '';
+        document.getElementById('ingredient-quantity').value = '';
+        document.getElementById('ingredient-price').value = '';
+        
+        // Mostrar mensaje de éxito
+        showToast('Ingrediente agregado');
+      } else {
+        // Mostrar mensaje de error
+        showToast('Por favor completa todos los campos', 'error');
+      }
+    }
+    
+    function updateIngredientsList() {
+      const ingredientsList = document.getElementById('ingredients-list');
+      ingredientsList.innerHTML = '';
+      
+      if (ingredients.length === 0) {
+        ingredientsList.innerHTML = '<p style="text-align:center; color:var(--text-secondary); padding:16px;">No hay ingredientes agregados</p>';
+        return;
+      }
+      
+      ingredients.forEach((ingredient, index) => {
+        const li = document.createElement('li');
+        li.className = 'list-item';
+        li.style.padding = '16px';
+        li.style.borderBottom = '1px solid #eee';
+        li.style.display = 'flex';
+        li.style.justifyContent = 'space-between';
+        li.style.alignItems = 'center';
+        
+        li.innerHTML = `
+          <div style="flex: 1;">
+            <h4 style="margin: 0; font-weight: 500;">${ingredient.name}</h4>
+            <p style="margin: 4px 0 0; color: var(--text-secondary); font-size: 14px;">
+              ${ingredient.quantity} ${ingredient.unit}
+              <span style="display: inline-block; padding: 4px 8px; border-radius: 100px; background-color: rgba(76, 175, 80, 0.15); color: #2e7d32; font-size: 12px; font-weight: 600;">S/${ingredient.price.toFixed(2)}</span>
+            </p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button onclick="editIngredient(${ingredient.id})" style="background: transparent; border: none; color: var(--text-secondary); cursor: pointer; padding: 8px; border-radius: 50%;">
+              <span class="material-icons">edit</span>
+            </button>
+            <button onclick="deleteIngredient(${ingredient.id})" style="background: transparent; border: none; color: var(--text-secondary); cursor: pointer; padding: 8px; border-radius: 50%;">
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+        `;
+        
+        ingredientsList.appendChild(li);
+      });
+    }
+    
+    function saveIngredientsToStorage() {
+      localStorage.setItem('ingredients', JSON.stringify(ingredients));
+    }
+    
+    // Funciones globales para manipular ingredientes
+    window.deleteIngredient = function(id) {
+      ingredients = ingredients.filter(item => item.id !== id);
+      updateIngredientsList();
+      saveIngredientsToStorage();
+      showToast('Ingrediente eliminado');
+    };
+    
+    window.editIngredient = function(id) {
+      const ingredient = ingredients.find(item => item.id === id);
+      if (ingredient) {
+        document.getElementById('ingredient-name').value = ingredient.name;
+        document.getElementById('ingredient-quantity').value = ingredient.quantity;
+        document.getElementById('ingredient-unit').value = ingredient.unit;
+        document.getElementById('ingredient-price').value = ingredient.price;
+        
+        // Eliminar el ingrediente actual, luego se volverá a agregar al editar
+        deleteIngredient(id);
+        
+        // Scroll al formulario
+        document.getElementById('ingredient-name').scrollIntoView({behavior: 'smooth'});
+        document.getElementById('ingredient-name').focus();
+      }
+    };
+    
+    // Función para borrar todo
+    document.getElementById('reset-all-header').addEventListener('click', function() {
+      if (confirm('¿Estás seguro que deseas borrar TODOS los datos? Esta acción no se puede deshacer.')) {
+        // Borrar ingredientes
+        ingredients = [];
+        updateIngredientsList();
+        localStorage.removeItem('ingredients');
+        
+        // Borrar título
+        document.getElementById('recipe-title').value = '';
+        localStorage.removeItem('recipe-title');
+        
+        showToast('Todos los datos han sido borrados', 'info');
+      }
+    });
+    
+    // Título de la receta
+    const recipeTitle = document.getElementById('recipe-title');
+    recipeTitle.value = localStorage.getItem('recipe-title') || '';
+    
+    recipeTitle.addEventListener('input', () => {
+      localStorage.setItem('recipe-title', recipeTitle.value);
+    });
+    
+    // Mostrar mensaje informativo al usuario
+    setTimeout(() => {
+      showToast('Versión optimizada cargada', 'info');
+      
+      setTimeout(() => {
+        showToast('Todos los botones deberían funcionar ahora', 'info');
+      }, 3000);
+    }, 1000);
+    
+    // Botón de agregar ingrediente también con event listener normal
+    document.getElementById('add-ingredient').addEventListener('click', addIngredient);
+  </script>
+</body>
+</html>
