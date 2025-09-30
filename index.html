@@ -2264,7 +2264,7 @@
         printContent.innerHTML = html;
     // --- DOP SVG para impresión ---
     function generarDOPSVG(pasos) {
-      const circleRadius = 28;
+      const circleRadius = 30;
       const stepGap = 80;
       const width = Math.max(360, pasos.length * (circleRadius * 2 + stepGap));
       const height = 120;
@@ -2335,56 +2335,6 @@
 
     // Botón de borrar todo
     const resetAllButton = document.getElementById('reset-all-header');
-    if (resetAllButton) {
-        resetAllButton.addEventListener('click', () => {
-            if (confirm('¿Estás seguro de que quieres borrar TODOS los datos de la receta? Esta acción no se puede deshacer.')) {
-                localStorage.clear();
-                location.reload();
-            }
-        });
-    }
-    // --- BITÁCORA ---
-    // Guardar anotaciones de la bitácora
-    const addLogbookBtn = document.getElementById('add-logbook-entry');
-    const logbookList = document.getElementById('logbook-entries-list');
-    function renderLogbook() {
-      const entries = JSON.parse(localStorage.getItem('bitacora') || '[]');
-      logbookList.innerHTML = '';
-      if (entries.length === 0) {
-        logbookList.innerHTML = '<li style="color:#888;">No hay anotaciones aún.</li>';
-        return;
-      }
-      entries.forEach(entry => {
-        const li = document.createElement('li');
-        li.className = 'logbook-entry';
-        li.innerHTML = `<strong>${entry.title}</strong> <span style="color:#888;">(${entry.category})</span><br>
-          <span style="font-size:12px;">${entry.date}</span><br>
-          <span>${entry.text}</span>`;
-        logbookList.appendChild(li);
-      });
-    }
-    if (addLogbookBtn) {
-      addLogbookBtn.addEventListener('click', () => {
-        const date = document.getElementById('logbook-date').value || new Date().toLocaleDateString('es-PE');
-        const title = document.getElementById('logbook-title').value.trim();
-        const category = document.getElementById('logbook-category').value;
-        const text = document.getElementById('logbook-text').value.trim();
-        if (!title || !text) {
-          showToast('Completa título y descripción', 'warning');
-          return;
-        }
-        const entry = { date, title, category, text };
-        const entries = JSON.parse(localStorage.getItem('bitacora') || '[]');
-        entries.push(entry);
-        localStorage.setItem('bitacora', JSON.stringify(entries));
-        renderLogbook();
-        document.getElementById('logbook-title').value = '';
-        document.getElementById('logbook-text').value = '';
-        showToast('Anotación guardada');
-      });
-      renderLogbook();
-    }
-
     // --- PUNTO DE EQUILIBRIO ---
     const calcularBtn = document.getElementById('calcular-equilibrio');
     if (calcularBtn) {
