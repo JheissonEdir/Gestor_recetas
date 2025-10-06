@@ -102,8 +102,97 @@
       border-radius: 4px;
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
-  <script src="./breakeven-chart.js" defer></script>
+  <!-- Remover Chart.js que está causando problemas -->
+  <script>
+    // Función simple para generar gráfico SVG sin dependencias externas
+    function generarGraficoSVG(costosFijos, costoVariableUnitario, precioVenta, unidadesEquilibrio) {
+      const container = document.getElementById('breakeven-chart-container');
+      if (!container) {
+        console.error('Contenedor breakeven-chart-container no encontrado');
+        return false;
+      }
+      
+      const maxUnits = Math.max(10, unidadesEquilibrio * 2);
+      const maxMoney = Math.max(costosFijos * 2, unidadesEquilibrio * precioVenta * 1.2);
+      
+      const width = 600;
+      const height = 400;
+      const margin = { top: 20, right: 20, bottom: 60, left: 60 };
+      const chartWidth = width - margin.left - margin.right;
+      const chartHeight = height - margin.top - margin.bottom;
+      
+      let svg = `
+        <svg width="${width}" height="${height}" style="background: white; border: 1px solid #ddd; border-radius: 8px;">
+          <!-- Título -->
+          <text x="${width/2}" y="20" text-anchor="middle" style="font-size: 16px; font-weight: bold; fill: #333;">
+            Punto de Equilibrio: ${unidadesEquilibrio} unidades (S/${(unidadesEquilibrio * precioVenta).toFixed(2)})
+          </text>
+          
+          <!-- Ejes -->
+          <line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${height - margin.bottom}" stroke="#333" stroke-width="2"/>
+          <line x1="${margin.left}" y1="${height - margin.bottom}" x2="${width - margin.right}" y2="${height - margin.bottom}" stroke="#333" stroke-width="2"/>
+          
+          <!-- Etiquetas de ejes -->
+          <text x="${margin.left + chartWidth/2}" y="${height - 10}" text-anchor="middle" style="font-size: 12px; fill: #666;">Unidades</text>
+          <text x="20" y="${margin.top + chartHeight/2}" text-anchor="middle" transform="rotate(-90, 20, ${margin.top + chartHeight/2})" style="font-size: 12px; fill: #666;">Monto (S/)</text>
+      `;
+      
+      // Líneas del gráfico
+      const points = [];
+      for (let i = 0; i <= maxUnits; i += Math.max(1, Math.floor(maxUnits/10))) {
+        const x = margin.left + (i / maxUnits) * chartWidth;
+        const costoTotal = costosFijos + (i * costoVariableUnitario);
+        const ingresos = i * precioVenta;
+        
+        const yCostoTotal = height - margin.bottom - (costoTotal / maxMoney) * chartHeight;
+        const yIngresos = height - margin.bottom - (ingresos / maxMoney) * chartHeight;
+        const yCostosFijos = height - margin.bottom - (costosFijos / maxMoney) * chartHeight;
+        
+        points.push({ x, yCostoTotal, yIngresos, yCostosFijos, units: i });
+      }
+      
+      // Línea de costos fijos
+      svg += `<line x1="${margin.left}" y1="${points[0].yCostosFijos}" x2="${width - margin.right}" y2="${points[0].yCostosFijos}" stroke="#FF9800" stroke-width="2" stroke-dasharray="5,5"/>`;
+      
+      // Líneas de costos totales e ingresos
+      let costosPath = `M ${points[0].x} ${points[0].yCostoTotal}`;
+      let ingresosPath = `M ${points[0].x} ${points[0].yIngresos}`;
+      
+      for (let i = 1; i < points.length; i++) {
+        costosPath += ` L ${points[i].x} ${points[i].yCostoTotal}`;
+        ingresosPath += ` L ${points[i].x} ${points[i].yIngresos}`;
+      }
+      
+      svg += `<path d="${costosPath}" stroke="#f44336" stroke-width="3" fill="none"/>`;
+      svg += `<path d="${ingresosPath}" stroke="#4caf50" stroke-width="3" fill="none"/>`;
+      
+      // Punto de equilibrio
+      const xEquilibrio = margin.left + (unidadesEquilibrio / maxUnits) * chartWidth;
+      const yEquilibrio = height - margin.bottom - ((unidadesEquilibrio * precioVenta) / maxMoney) * chartHeight;
+      svg += `<circle cx="${xEquilibrio}" cy="${yEquilibrio}" r="6" fill="#1976d2" stroke="white" stroke-width="2"/>`;
+      
+      // Leyenda
+      svg += `
+        <g transform="translate(${width - 200}, 50)">
+          <rect x="0" y="0" width="180" height="80" fill="white" stroke="#ddd" stroke-width="1" rx="4"/>
+          <line x1="10" y1="15" x2="30" y2="15" stroke="#FF9800" stroke-width="2" stroke-dasharray="5,5"/>
+          <text x="35" y="19" style="font-size: 12px; fill: #333;">Costos Fijos</text>
+          <line x1="10" y1="35" x2="30" y2="35" stroke="#f44336" stroke-width="2"/>
+          <text x="35" y="39" style="font-size: 12px; fill: #333;">Costos Totales</text>
+          <line x1="10" y1="55" x2="30" y2="55" stroke="#4caf50" stroke-width="2"/>
+          <text x="35" y="59" style="font-size: 12px; fill: #333;">Ingresos</text>
+        </g>
+      `;
+      
+      svg += '</svg>';
+      
+      container.innerHTML = svg;
+      return true;
+    }
+    
+    // Hacer disponible globalmente
+    window.generarGraficoPuntoEquilibrio = generarGraficoSVG;
+  </script>
   <script>
     // Forzar idioma español
     if (document.documentElement.lang !== 'es') {
@@ -683,6 +772,44 @@
         grid-template-columns: repeat(4, 1fr);
       }
     }
+    
+    /* Estilos específicos para la bitácora */
+    .logbook-entry-item {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .logbook-entry-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .logbook-action-buttons button {
+      transition: all 0.2s ease;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .logbook-action-buttons button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    
+    @media (max-width: 600px) {
+      .logbook-action-buttons {
+        flex-direction: column;
+        gap: 4px !important;
+      }
+      
+      .logbook-action-buttons button {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .logbook-action-buttons button span:last-child {
+        display: none;
+      }
+    }
   </style>
 </head>
 <body>
@@ -694,6 +821,23 @@
         Recetas Chef Perú
       </h1>
       <input type="text" class="recipe-input" id="recipe-title" placeholder="Nombre de la receta...">
+      
+      <!-- Campo para logo/imagen del reporte -->
+      <div style="margin-top: 12px; display: flex; align-items: center; gap: 12px;">
+        <div class="file-input-wrapper" style="width: auto;">
+          <div class="file-input-button" style="padding: 8px 12px; font-size: 14px;">
+            <span class="material-icons" style="font-size: 18px;">image</span>
+            Logo del Reporte
+          </div>
+          <input type="file" id="report-logo" accept="image/*">
+        </div>
+        <div id="logo-preview" style="display: none;">
+          <img id="logo-image" src="" alt="Logo" style="max-height: 40px; border-radius: 4px; border: 1px solid #ddd;">
+          <button id="remove-logo" style="background: none; border: none; color: #f44336; margin-left: 8px; cursor: pointer;">
+            <span class="material-icons" style="font-size: 16px;">close</span>
+          </button>
+        </div>
+      </div>
     </div>
     <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
       <button id="reset-all-header" class="btn" style="background-color: #F44336; color: white; padding: 8px 12px; font-size: 14px;">
@@ -793,6 +937,11 @@
           Agregar Paso
         </button>
         
+        <button class="btn btn-secondary btn-block" id="cancel-edit-step" style="display: none; margin-top: 8px;">
+          <span class="material-icons">cancel</span>
+          Cancelar Edición
+        </button>
+        
         <div style="margin-top: 24px;">
           <h3 style="color: var(--text-secondary); font-size: 16px; font-weight: 500;">Pasos a seguir</h3>
           <div class="steps-container" style="background-color: #f9f9f9; border-radius: 8px; padding: 16px;">
@@ -811,6 +960,7 @@
         <p style="color: var(--text-secondary); margin-top: -8px; margin-bottom: 12px;">Fotos de los ingredientes antes de iniciar la preparación</p>
         <div style="background-color: #f9f4e8; padding: 8px 12px; border-radius: 8px; margin-bottom: 12px;">
           <span style="color: var(--primary-color); font-weight: 600;">A1, A2, A3...</span> Fotos numeradas automáticamente con fecha y ubicación
+          <br><small id="before-photo-limit" style="color: #666;"></small>
         </div>
         
         <div class="file-input-wrapper">
@@ -841,6 +991,7 @@
         <p style="color: var(--text-secondary); margin-top: -8px; margin-bottom: 12px;">Fotos del proceso de preparación en curso</p>
         <div style="background-color: #f9f4e8; padding: 8px 12px; border-radius: 8px; margin-bottom: 12px;">
           <span style="color: var(--primary-color); font-weight: 600;">D1, D2, D3...</span> Fotos numeradas automáticamente con fecha y ubicación
+          <br><small id="during-photo-limit" style="color: #666;"></small>
         </div>
         
         <div class="file-input-wrapper">
@@ -871,6 +1022,7 @@
         <p style="color: var(--text-secondary); margin-top: -8px; margin-bottom: 12px;">Fotos del resultado final y la presentación del plato</p>
         <div style="background-color: #f9f4e8; padding: 8px 12px; border-radius: 8px; margin-bottom: 12px;">
           <span style="color: var(--primary-color); font-weight: 600;">P1, P2, P3...</span> Fotos numeradas automáticamente con fecha y ubicación
+          <br><small id="after-photo-limit" style="color: #666;"></small>
         </div>
         
         <div class="file-input-wrapper">
@@ -933,6 +1085,11 @@
           Agregar Anotación
         </button>
         
+        <button class="btn btn-secondary btn-block" id="cancel-edit-logbook" style="display: none; margin-top: 8px;">
+          <span class="material-icons">cancel</span>
+          Cancelar Edición
+        </button>
+        
         <div style="margin-top: 24px;">
           <h3 style="color: var(--text-secondary); font-size: 16px; font-weight: 500;">Anotaciones</h3>
           <ul class="list" id="logbook-entries-list">
@@ -983,6 +1140,11 @@
           <div class="summary-row">
             <span class="summary-label">Fotos agregadas:</span>
             <span class="summary-value" id="summary-photos">0</span>
+          </div>
+          
+          <div class="summary-row">
+            <span class="summary-label">Anotaciones bitácora:</span>
+            <span class="summary-value" id="summary-logbook">0</span>
           </div>
           
           <div class="summary-row">
@@ -1040,6 +1202,41 @@
             <p style="margin-top: 5px;"><strong>Ejemplo:</strong> Si tus costos fijos son S/500, el precio de venta es S/7 y el costo variable unitario es S/5, el punto de equilibrio sería 250 unidades. Esto significa que a partir de la unidad 251 empezarías a generar ganancias.</p>
           </div>
           
+          <div class="alert" style="background-color: #E3F2FD; border-left: 4px solid #2196F3; padding: 12px; margin-bottom: 16px; border-radius: 4px;">
+            <h4 style="margin: 0 0 8px 0; color: #1565C0; font-size: 16px;">🎯 Experimento Educativo</h4>
+            <p style="margin: 0; color: #1976D2;">
+              <strong>¿Qué pasa si mis ingredientes no cuestan nada?</strong><br>
+              Si extraes productos de la naturaleza (frutas silvestres, hierbas, etc.) o tienes ingredientes "gratis", 
+              pon <strong>precio 0</strong> en tus ingredientes y experimenta cómo cambia tu análisis de ganancia.
+              <br><br>
+              💡 <strong>Pregunta para reflexionar:</strong> ¿Cómo afecta tener costos cero en mi estrategia de precios?
+            </p>
+          </div>
+          
+          <div class="alert" style="background-color: #E8F5E8; border-left: 4px solid #4CAF50; padding: 12px; margin-bottom: 16px; border-radius: 4px;">
+            <h4 style="margin: 0 0 8px 0; color: #2E7D32; font-size: 16px;">💰 Información de Costos Base</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: center;">
+              <div>
+                <strong>Costo total de ingredientes:</strong><br>
+                <span id="costo-ingredientes-display" style="font-size: 18px; color: #2E7D32; font-weight: 600;">S/0.00</span>
+              </div>
+              <div>
+                <strong>Costo por unidad de ingredientes:</strong><br>
+                <span id="costo-unitario-ingredientes" style="font-size: 18px; color: #1976D2; font-weight: 600;">S/0.00</span>
+              </div>
+            </div>
+            <div id="analisis-precio" style="margin-top: 12px; padding: 8px; border-radius: 4px; display: none;">
+              <strong>Análisis de tu precio:</strong><br>
+              <span id="resultado-analisis" style="font-weight: 600;"></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="input-label" for="rendimiento-ingredientes">¿Para cuántas unidades rinden estos ingredientes?</label>
+            <input type="number" step="1" min="1" class="text-input" id="rendimiento-ingredientes" placeholder="Ej: 15">
+            <small style="display: block; color: #666; margin-top: 4px;">Con el dinero gastado en ingredientes, ¿cuántos productos completos puedes hacer? Esto define el costo real por unidad.</small>
+          </div>
+
           <div class="form-group">
             <label class="input-label" for="costos-fijos">Costos fijos (S/)</label>
             <input type="number" step="0.01" class="text-input" id="costos-fijos" placeholder="Ej: alquiler, servicios, etc.">
@@ -1053,15 +1250,15 @@
           </div>
           
           <div class="form-group">
-            <label class="input-label" for="precio-venta">Precio de venta (S/)</label>
-            <input type="number" step="0.01" class="text-input" id="precio-venta">
-            <small style="display: block; color: #666; margin-top: 4px;">El precio al que venderás cada unidad de tu producto</small>
+            <label class="input-label" for="precio-venta">Precio de venta por unidad (S/)</label>
+            <input type="number" step="0.01" class="text-input" id="precio-venta" placeholder="Calcula tu precio considerando costos y ganancia deseada">
+            <small style="display: block; color: #666; margin-top: 4px;">El precio al que venderás cada unidad de tu producto. Debe cubrir costos y generar ganancia.</small>
           </div>
 
           <div class="form-group">
             <label class="input-label" for="cantidad-producida">Cantidad a producir (unidades)</label>
-            <input type="number" step="1" class="text-input" id="cantidad-producida" placeholder="Ej: 100">
-            <small style="display: block; color: #666; margin-top: 4px;">Número de unidades que planeas producir y vender</small>
+            <input type="number" step="1" class="text-input" id="cantidad-producida" placeholder="Se copia automáticamente" readonly style="background-color: #f5f5f5; cursor: not-allowed;">
+            <small style="display: block; color: #666; margin-top: 4px;">Este valor se copia automáticamente del rendimiento de ingredientes. Es la base para el cálculo del punto de equilibrio.</small>
           </div>
           
           <button class="btn btn-secondary" id="calcular-equilibrio">
@@ -1088,8 +1285,10 @@
           
           <div style="margin-top: 24px;">
             <h4 style="color: var(--text-secondary); font-size: 16px; margin-bottom: 12px;">Gráfica de Punto de Equilibrio</h4>
-            <div id="chart-container" class="chart-container" style="position: relative; height: 300px; border: 1px solid #eee; border-radius: 8px; padding: 16px;">
-              <canvas id="break-even-chart"></canvas>
+            <div id="breakeven-chart-container" class="chart-container" style="position: relative; min-height: 300px; border: 1px solid #eee; border-radius: 8px; padding: 16px; text-align: center;">
+              <p style="color: #666; font-style: italic; padding: 60px 20px;">
+                Haz clic en "Calcular Punto de Equilibrio" para generar el gráfico.
+              </p>
             </div>
             <p style="color: var(--text-secondary); font-size: 12px; text-align: center; margin-top: 8px;">
               La gráfica muestra los costos fijos (línea horizontal), costos variables (línea inclinada) e ingresos (línea inclinada).
@@ -1210,6 +1409,98 @@
     }
     
     // Encapsular todo el código en DOMContentLoaded para asegurar que el DOM está completamente cargado
+    
+    // Variables globales - Inicializar al principio para evitar errores
+    let ingredients = [];
+    let steps = [];
+    let editingStepIndex = -1;
+    let logbookEntries = [];
+    let editingLogbookIndex = -1;
+    
+    // Configuración de fotos según conexión
+    let photoConfig = {
+      maxPhotosOnline: 50,
+      maxPhotosOffline: 10,
+      compressionQuality: 0.6,
+      maxWidth: 800
+    };
+    
+    // Función para detectar si estamos online
+    function isOnline() {
+      return navigator.onLine;
+    }
+    
+    // Función para obtener límite de fotos según conexión
+    function getMaxPhotos() {
+      return isOnline() ? photoConfig.maxPhotosOnline : photoConfig.maxPhotosOffline;
+    }
+    
+    // Función para verificar y limpiar localStorage si está lleno
+    function checkStorageQuota() {
+      try {
+        const test = 'test';
+        localStorage.setItem(test, test);
+        localStorage.removeItem(test);
+        return true;
+      } catch (e) {
+        console.warn('localStorage lleno, limpiando fotos antiguas...');
+        cleanOldPhotos();
+        return false;
+      }
+    }
+    
+    // Función para actualizar indicadores de límite de fotos
+    function updatePhotoLimitIndicators() {
+      const maxPhotosPerCategory = 10; // Límite fijo por categoría
+      const isOnlineStatus = isOnline();
+      const statusText = isOnlineStatus ? 'Online' : 'Offline';
+      const statusColor = isOnlineStatus ? '#4CAF50' : '#FF9800';
+      
+      console.log('Actualizando indicadores de fotos:', { maxPhotosPerCategory, isOnlineStatus });
+      
+      ['before', 'during', 'after'].forEach(category => {
+        const storageKey = `${category}-photos-photos`;
+        const currentPhotos = JSON.parse(localStorage.getItem(storageKey) || '[]').length;
+        const indicator = document.getElementById(`${category}-photo-limit`);
+        
+        console.log(`${category}: ${currentPhotos}/${maxPhotosPerCategory} fotos, elemento:`, indicator);
+        
+        if (indicator) {
+          const warningText = currentPhotos >= maxPhotosPerCategory 
+            ? '<span style="color: #f44336;">⚠️ Límite alcanzado</span>' 
+            : '';
+          
+          indicator.innerHTML = `
+            <span style="color: ${statusColor};">📡 ${statusText}</span> - 
+            ${currentPhotos}/${maxPhotosPerCategory} fotos
+            ${warningText}
+          `;
+          console.log(`Indicador actualizado para ${category}`);
+        } else {
+          console.warn(`Elemento ${category}-photo-limit no encontrado`);
+        }
+      });
+    }
+    
+    // Actualizar indicadores cuando cambie el estado de conexión
+    window.addEventListener('online', updatePhotoLimitIndicators);
+    window.addEventListener('offline', updatePhotoLimitIndicators);
+    
+    // Función para limpiar fotos antiguas cuando localStorage está lleno
+    function cleanOldPhotos() {
+      const photoKeys = ['before-photos-photos', 'during-photos-photos', 'after-photos-photos'];
+      photoKeys.forEach(key => {
+        const photos = JSON.parse(localStorage.getItem(key) || '[]');
+        if (photos.length > 5) {
+          const reducedPhotos = photos.slice(-5); // Mantener solo las últimas 5
+          localStorage.setItem(key, JSON.stringify(reducedPhotos));
+          console.log(`Reducidas fotos en ${key} a ${reducedPhotos.length}`);
+        }
+      });
+      // Actualizar indicadores después de limpiar
+      updatePhotoLimitIndicators();
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       // Protección real contra copiar/pegar/contextmenu en preparación
       const prepStep = document.getElementById('preparation-step');
@@ -1233,40 +1524,57 @@
       }
       console.log('Inicializando la aplicación...');
       
-      // Actualizar resumen y fotos del resumen
+      // Recuperar datos del almacenamiento local ANTES de llamar updateSummary
+      const savedIngredients = localStorage.getItem('ingredients');
+      if (savedIngredients) {
+        ingredients = JSON.parse(savedIngredients);
+      }
+      
+      const savedSteps = localStorage.getItem('steps');
+      if (savedSteps) {
+        steps = JSON.parse(savedSteps);
+      }
+      
+      const savedLogbookEntries = localStorage.getItem('logbook-entries');
+      if (savedLogbookEntries) {
+        logbookEntries = JSON.parse(savedLogbookEntries);
+      }
+      
+      // Verificar quota de storage
+      checkStorageQuota();
+      
+      // Actualizar indicadores de límite de fotos
+      updatePhotoLimitIndicators();
+      
+      // Actualizar resumen y fotos del resumen DESPUÉS de cargar datos
       updateSummary();
       updateSummaryPhotos();
       
       // Cargar fotos inmediatamente al iniciar la aplicación
       setTimeout(function() {
         console.log('Inicializando fotos...');
-        // Cargar fotos desde localStorage para cada sección
-        ['before-photos', 'during-photos', 'after-photos'].forEach(sectionId => {
-          try {
-            const photosData = localStorage.getItem(`${sectionId}-photos`); // Usar la clave correcta con -photos
-            if (photosData) {
-              const photos = JSON.parse(photosData);
-              console.log(`Fotos cargadas para ${sectionId}:`, photos.length);
-              updatePhotoContainer(sectionId, photos);
-            }
-          } catch (error) {
-            console.error(`Error al cargar fotos para ${sectionId}:`, error);
-          }
-        });
+        // Cargar fotos guardadas de forma segura
+        loadSavedPhotos();
         
         // Actualizar las fotos en la sección de resumen después de cargar las fotos principales
-        updateSummaryPhotos();
-        
-        // Actualizar la vista de resumen de fotos
         updateSummaryPhotos();
       }, 500);
       
       // Corregir textos de navegación
       corregirTextosNavegacion();
+      
+      console.log('Configurando navegación de pestañas...');
+      
+      // Verificar que la pestaña inicial esté activa
+      const initialTab = document.querySelector('.nav-tab.active');
+      const initialContent = document.querySelector('.tab-content.active');
+      console.log('Pestaña inicial:', initialTab ? initialTab.getAttribute('data-tab') : 'ninguna');
+      console.log('Contenido inicial activo:', initialContent ? initialContent.id : 'ninguno');
     
     // Funcionalidad de las pestañas
     document.querySelectorAll('.nav-tab').forEach(tab => {
       tab.addEventListener('click', () => {
+        console.log('Pestaña clickeada:', tab.getAttribute('data-tab'));
         // Desactivar todas las pestañas
         document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -1274,7 +1582,13 @@
         // Activar la pestaña seleccionada
         tab.classList.add('active');
         const tabId = tab.getAttribute('data-tab') + '-tab';
-        document.getElementById(tabId).classList.add('active');
+        const tabContent = document.getElementById(tabId);
+        if (tabContent) {
+          tabContent.classList.add('active');
+          console.log('Pestaña activada:', tabId);
+        } else {
+          console.error('Contenido de pestaña no encontrado:', tabId);
+        }
         
         // Si es la pestaña de imprimir o resultado, actualizar la vista correspondiente
         if (tabId === 'print-tab') {
@@ -1282,16 +1596,27 @@
         } else if (tabId === 'result-tab') {
           updateSummary();
           updateSummaryPhotos();
+          // Actualizar costos de punto de equilibrio
+          if (window.updateBreakevenCosts) {
+            window.updateBreakevenCosts();
+          }
         }
         
         // Animación para el contenido
-        document.getElementById(tabId).style.animation = 'scaleIn 0.3s ease-out forwards';
+        if (tabContent) {
+          tabContent.style.animation = 'scaleIn 0.3s ease-out forwards';
+        }
       });
     });
     
-    // Variables globales
-    let ingredients = [];
-    let steps = []; // Inicializar steps como variable global
+    // Resumen final de inicialización
+    console.log('=== RESUMEN DE INICIALIZACIÓN ===');
+    console.log('Ingredientes cargados:', ingredients.length);
+    console.log('Pasos cargados:', steps.length);
+    console.log('Anotaciones bitácora cargadas:', logbookEntries.length);
+    console.log('Estado de conexión:', isOnline() ? 'Online' : 'Offline');
+    console.log('Límite de fotos:', getMaxPhotos());
+    console.log('==================================');
     
     // Gestión de ingredientes
     const addIngredientBtn = document.getElementById('add-ingredient');
@@ -1301,11 +1626,12 @@
     console.log('Elemento addIngredientBtn:', addIngredientBtn ? 'Encontrado' : 'NO ENCONTRADO');
     console.log('Elemento ingredientsList:', ingredientsList ? 'Encontrado' : 'NO ENCONTRADO');
     
-    // Recuperar ingredientes del almacenamiento local
-    const savedIngredients = localStorage.getItem('ingredients');
-    if (savedIngredients) {
-      ingredients = JSON.parse(savedIngredients);
+    // Los ingredientes ya fueron cargados al inicio
+    if (ingredients.length > 0) {
+      console.log('Cargando ingredientes al inicio:', ingredients.length);
       updateIngredientsList();
+    } else {
+      console.log('No hay ingredientes para cargar');
     }
     
     // Definir la función para agregar ingrediente
@@ -1443,13 +1769,14 @@
     console.log('Elemento addStepButton:', addStepButton ? 'Encontrado' : 'NO ENCONTRADO');
     console.log('Elemento stepsList:', stepsList ? 'Encontrado' : 'NO ENCONTRADO');
     
-    // Recuperar pasos del almacenamiento local
-    const savedSteps = localStorage.getItem('steps');
-    if (savedSteps) {
-      steps = JSON.parse(savedSteps);
+    // Los pasos ya fueron cargados al inicio
+    if (steps.length > 0) {
+      console.log('Cargando pasos al inicio:', steps.length);
       if (typeof updateStepsList === 'function') {
         updateStepsList();
       }
+    } else {
+      console.log('No hay pasos para cargar');
     }
     
     // Verificar si hay datos en localStorage cada vez que se carga la página
@@ -1468,25 +1795,46 @@
     // Definir la función para agregar paso
     function addStep() {
       console.log('Función addStep ejecutada');
-      const stepText = document.getElementById('preparation-step').value;
+      const stepText = document.getElementById('preparation-step').value.trim();
       
       console.log('Texto del paso:', stepText);
       
       if (stepText) {
-        const step = {
-          id: Date.now(),
-          text: stepText
-        };
+        if (editingStepIndex !== -1) {
+          // Modo edición: actualizar el paso existente en su posición original
+          steps[editingStepIndex].text = stepText;
+          editingStepIndex = -1; // Resetear el índice de edición
+          
+          // Restaurar el botón a su estado normal
+          const addButton = document.getElementById('add-step');
+          const cancelButton = document.getElementById('cancel-edit-step');
+          
+          if (addButton) {
+            addButton.innerHTML = '<span class="material-icons">playlist_add</span> Agregar Paso';
+            addButton.style.backgroundColor = ''; // Restaurar color original
+          }
+          
+          if (cancelButton) {
+            cancelButton.style.display = 'none'; // Ocultar botón cancelar
+          }
+          
+          showToast('Paso actualizado correctamente');
+        } else {
+          // Modo agregar: crear nuevo paso
+          const step = {
+            id: Date.now(),
+            text: stepText
+          };
+          
+          steps.push(step);
+          showToast('Paso agregado');
+        }
         
-        steps.push(step);
         updateStepsList();
         saveStepsToStorage();
         
         // Limpiar formulario
         document.getElementById('preparation-step').value = '';
-        
-        // Mostrar mensaje de éxito
-        showToast('Paso agregado');
       } else {
         // Mostrar mensaje de error
         showToast('Por favor ingresa un texto para el paso', 'error');
@@ -1548,18 +1896,64 @@
     };
     
     window.editStep = function(id) {
-      const step = steps.find(item => item.id === id);
-      if (step) {
-        document.getElementById('preparation-step').value = step.text;
+      const stepIndex = steps.findIndex(item => item.id === id);
+      const step = steps[stepIndex];
+      if (step && stepIndex !== -1) {
+        // Guardar la posición del paso que se está editando
+        editingStepIndex = stepIndex;
         
-        // Eliminar el paso actual, luego se volverá a agregar al editar
-        deleteStep(id);
+        // Colocar el texto en el formulario
+        document.getElementById('preparation-step').value = step.text;
         
         // Scroll al formulario
         document.getElementById('preparation-step').scrollIntoView({behavior: 'smooth'});
         document.getElementById('preparation-step').focus();
+        
+        // Cambiar el texto del botón para indicar que se está editando
+        const addButton = document.getElementById('add-step');
+        const cancelButton = document.getElementById('cancel-edit-step');
+        
+        if (addButton) {
+          addButton.innerHTML = '<span class="material-icons">edit</span> Actualizar Paso';
+          addButton.style.backgroundColor = '#FF9800'; // Color naranja para edición
+        }
+        
+        if (cancelButton) {
+          cancelButton.style.display = 'block'; // Mostrar botón cancelar
+        }
+        
+        showToast('Editando paso ' + (stepIndex + 1), 'warning');
       }
     };
+    
+    // Función para cancelar la edición
+    function cancelEdit() {
+      editingStepIndex = -1;
+      
+      // Limpiar formulario
+      document.getElementById('preparation-step').value = '';
+      
+      // Restaurar el botón a su estado normal
+      const addButton = document.getElementById('add-step');
+      const cancelButton = document.getElementById('cancel-edit-step');
+      
+      if (addButton) {
+        addButton.innerHTML = '<span class="material-icons">playlist_add</span> Agregar Paso';
+        addButton.style.backgroundColor = ''; // Restaurar color original
+      }
+      
+      if (cancelButton) {
+        cancelButton.style.display = 'none'; // Ocultar botón cancelar
+      }
+      
+      showToast('Edición cancelada');
+    }
+    
+    // Asignar evento al botón cancelar
+    const cancelEditButton = document.getElementById('cancel-edit-step');
+    if (cancelEditButton) {
+      cancelEditButton.addEventListener('click', cancelEdit);
+    }
     
     // Manejo de fotos con fecha, ubicación y numeración
     // Función para comprimir imágenes antes de guardarlas
@@ -1659,7 +2053,15 @@
               location: locationText
             };
             
-            savePhotoToStorage(containerId, photoData);
+            // Intentar guardar y solo agregar al DOM si se guarda exitosamente
+            if (savePhotoToStorage(containerId, photoData)) {
+              container.appendChild(div);
+              // Actualizar la vista de resultados cuando se agregue una foto
+              updateSummaryPhotos();
+            } else {
+              // Si no se puede guardar, no agregar al DOM
+              console.warn('Foto no agregada al DOM porque no se pudo guardar');
+            }
           }).catch(err => {
             console.error('Error al comprimir la imagen:', err);
             showToast('Error al procesar una de las imágenes', 'error');
@@ -1697,7 +2099,14 @@
               location: 'No disponible'
             };
             
-            savePhotoToStorage(containerId, photoData);
+            // Intentar guardar y solo agregar al DOM si se guarda exitosamente
+            if (savePhotoToStorage(containerId, photoData)) {
+              container.appendChild(div);
+              // Actualizar la vista de resultados cuando se agregue una foto
+              updateSummaryPhotos();
+            } else {
+              console.warn('Foto no agregada al DOM porque no se pudo guardar');
+            }
           }).catch(err => {
             console.error('Error al comprimir la imagen:', err);
             showToast('Error al procesar una de las imágenes', 'error');
@@ -1719,28 +2128,9 @@
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
             
-            // Intentar obtener el nombre de la ubicación mediante reverse geocoding
-            // Agregamos encabezados para evitar problemas CORS
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`, {
-              headers: {
-                'User-Agent': 'RecetasChefPeru/1.0 (maxsystem@hotmail.com)',
-                'Accept-Language': 'es'
-              }
-            }).then(response => response.json())
-              .then(data => {
-                let locationName = 'Ubicación desconocida';
-                
-                if (data && data.display_name) {
-                  // Extraer solo la parte relevante de la dirección
-                  const addressParts = data.display_name.split(',');
-                  locationName = addressParts.slice(0, 2).join(', ');
-                }
-                
-                resolve(locationName);
-              })
-              .catch(err => {
-                resolve(`Lat: ${latitude.toFixed(4)}, Lon: ${longitude.toFixed(4)}`);
-              });
+            // Usar solo coordenadas para evitar problemas CORS
+            const locationString = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+            resolve(locationString);
           },
           error => {
             reject('Error al obtener ubicación');
@@ -1787,19 +2177,60 @@
       console.error('Elemento photo-after no encontrado');
     }
     
-    // Guardar fotos en localStorage con metadatos
+    // Guardar fotos en localStorage con metadatos y manejo de límites
     function savePhotoToStorage(containerId, photoData) {
       const storageKey = containerId + '-photos';
       let photos = JSON.parse(localStorage.getItem(storageKey) || '[]');
-      photos.push(photoData);
-      localStorage.setItem(storageKey, JSON.stringify(photos));
       
-      // Verificar que se guardó correctamente
-      const savedPhotos = JSON.parse(localStorage.getItem(storageKey) || '[]');
-      if (savedPhotos.length === photos.length) {
-        console.log(`Foto guardada exitosamente en ${storageKey}. Total: ${photos.length}`);
-      } else {
-        console.error(`Error al guardar foto en ${storageKey}`);
+      console.log(`Intentando guardar foto en ${containerId}:`, {
+        currentPhotos: photos.length,
+        photoData: photoData,
+        storageKey: storageKey
+      });
+      
+      // Verificar límite de fotos por categoría (más permisivo)
+      const maxPhotosPerCategory = 10; // Límite fijo más alto por categoría
+      
+      if (photos.length >= maxPhotosPerCategory) {
+        console.warn(`Límite alcanzado para ${containerId}: ${photos.length}/${maxPhotosPerCategory}`);
+        showToast(`Límite alcanzado para esta categoría: máximo ${maxPhotosPerCategory} fotos`, 'warning');
+        return false;
+      }
+      
+      try {
+        photos.push(photoData);
+        console.log(`Intentando guardar ${photos.length} fotos en ${storageKey}`);
+        localStorage.setItem(storageKey, JSON.stringify(photos));
+        
+        // Verificar que se guardó correctamente
+        const savedPhotos = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        if (savedPhotos.length === photos.length) {
+          console.log(`✅ Foto guardada exitosamente en ${storageKey}. Total: ${photos.length}/${maxPhotosPerCategory}`);
+          updatePhotoLimitIndicators(); // Actualizar indicadores después de guardar
+          return true;
+        } else {
+          console.error(`❌ Error al verificar guardado en ${storageKey}. Esperado: ${photos.length}, Actual: ${savedPhotos.length}`);
+          return false;
+        }
+      } catch (e) {
+        console.error(`❌ Excepción al guardar en ${storageKey}:`, e);
+        if (e.name === 'QuotaExceededError') {
+          console.warn('localStorage lleno, limpiando fotos antiguas...');
+          cleanOldPhotos();
+          // Intentar guardar de nuevo después de limpiar
+          try {
+            localStorage.setItem(storageKey, JSON.stringify(photos));
+            showToast('Foto guardada después de limpiar espacio', 'warning');
+            return true;
+          } catch (e2) {
+            showToast('Error: No se puede guardar la foto, storage lleno', 'error');
+            return false;
+          }
+        } else {
+          console.error('Error al guardar foto:', e);
+          showToast('Error al guardar la foto', 'error');
+          return false;
+        }
       }
     }
     
@@ -1811,6 +2242,11 @@
         const storageKey = containerId + '-photos';
         const photos = JSON.parse(localStorage.getItem(storageKey) || '[]');
         const container = document.getElementById(containerId);
+        
+        // Limpiar el contenedor antes de cargar para evitar duplicados
+        if (container) {
+          container.innerHTML = '';
+        }
         
         photos.forEach((photo, index) => {
           const div = document.createElement('div');
@@ -1827,7 +2263,7 @@
               <img src="${photo.src}" alt="Foto ${photo.category || ''} ${photo.number || index+1}">
               <div class="photo-info">
                 <div class="photo-date">${photo.date || 'Sin fecha'}</div>
-                ${photo.location ? `<div class="photo-location">${photo.location}</div>` : ''}
+                ${photo.location && photo.location !== 'No disponible' ? `<div class="photo-location">${photo.location}</div>` : ''}
               </div>
             `;
           }
@@ -1912,7 +2348,27 @@
           const img = document.createElement('img');
           // Usar la propiedad correcta según el formato de la foto guardada
           img.src = photo.src || photo.dataUrl || photo;
+          img.alt = `Foto ${photo.date || ''}`;
           img.style.width = '100%';
+          img.style.height = '100%';
+          img.style.objectFit = 'cover';
+          
+          // Manejar errores de carga de imagen
+          img.onerror = function() {
+            this.style.display = 'none';
+            const errorMsg = document.createElement('div');
+            errorMsg.textContent = 'Error al cargar imagen';
+            errorMsg.style.padding = '20px';
+            errorMsg.style.textAlign = 'center';
+            errorMsg.style.color = '#666';
+            imgContainer.appendChild(errorMsg);
+          };
+          
+          // Debug: registrar la carga de fotos
+          console.log('Cargando foto en resultado:', {
+            src: img.src,
+            photoData: photo
+          });
           img.style.height = '100%';
           img.style.objectFit = 'cover';
           img.style.transition = 'transform 0.3s ease';
@@ -2067,6 +2523,19 @@
           }
         }
         
+        // Contar anotaciones de bitácora
+        const summaryLogbook = document.getElementById('summary-logbook');
+        if (summaryLogbook) {
+          try {
+            const logbookEntries = JSON.parse(localStorage.getItem('logbook-entries') || '[]').length;
+            summaryLogbook.textContent = logbookEntries;
+            console.log(`Total anotaciones bitácora: ${logbookEntries}`);
+          } catch (error) {
+            console.error('Error al contar anotaciones de bitácora:', error);
+            summaryLogbook.textContent = '0';
+          }
+        }
+        
         // Verificar que ingredients esté definido antes de calcular el costo total
         let totalCost = 0;
         if (typeof ingredients !== 'undefined') {
@@ -2083,6 +2552,12 @@
         if (suggestedPriceElement) {
           suggestedPriceElement.textContent = `S/${suggestedPrice.toFixed(2)}`;
         }
+        
+        // Actualizar también los elementos de la sección de punto de equilibrio
+        const costoIngredientesDisplay = document.getElementById('costo-ingredientes-display');
+        if (costoIngredientesDisplay) {
+          costoIngredientesDisplay.textContent = `S/${totalCost.toFixed(2)}`;
+        }
       } catch (error) {
         console.error('Error en updateSummary:', error);
       }
@@ -2090,10 +2565,176 @@
     
     // ... (código anterior) ...
 
+    // Función para actualizar costos en tiempo real
+    function updateBreakevenCosts() {
+      try {
+        const ingredientes = JSON.parse(localStorage.getItem('ingredients') || '[]');
+        const costoTotalIngredientes = ingredientes.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0);
+        
+        const costoIngredientesDisplay = document.getElementById('costo-ingredientes-display');
+        if (costoIngredientesDisplay) {
+          costoIngredientesDisplay.textContent = `S/${costoTotalIngredientes.toFixed(2)}`;
+        }
+        
+        // Calcular costo por unidad basado en el RENDIMIENTO de los ingredientes
+        const rendimientoIngredientes = parseFloat(document.getElementById('rendimiento-ingredientes')?.value) || 0;
+        const costoUnitarioIngredientes = rendimientoIngredientes > 0 ? (costoTotalIngredientes / rendimientoIngredientes) : 0;
+        
+        const costoUnitarioDisplay = document.getElementById('costo-unitario-ingredientes');
+        if (costoUnitarioDisplay) {
+          if (rendimientoIngredientes > 0) {
+            costoUnitarioDisplay.textContent = `S/${costoUnitarioIngredientes.toFixed(2)}`;
+            costoUnitarioDisplay.parentElement.style.opacity = '1';
+          } else {
+            costoUnitarioDisplay.textContent = 'Especifica rendimiento';
+            costoUnitarioDisplay.parentElement.style.opacity = '0.6';
+          }
+        }
+        
+        // AUTO-LLENAR cantidad a producir con el rendimiento de ingredientes
+        const cantidadProducidaInput = document.getElementById('cantidad-producida');
+        if (cantidadProducidaInput && rendimientoIngredientes > 0) {
+          cantidadProducidaInput.value = rendimientoIngredientes;
+        } else if (cantidadProducidaInput) {
+          cantidadProducidaInput.value = '';
+        }
+        
+        // Analizar el precio de venta si está ingresado
+        analizarPrecioVenta();
+        
+        // Limpiar resultados de punto de equilibrio (se calculará con el botón)
+        document.getElementById('punto-equilibrio-unidades').textContent = '0';
+        document.getElementById('punto-equilibrio-ingresos').textContent = 'S/0.00';
+      } catch (error) {
+        console.error('Error al actualizar costos de punto de equilibrio:', error);
+      }
+    }
+    
+    // Función para analizar si el precio genera pérdida o ganancia (mejorada para casos educativos)
+    function analizarPrecioVenta() {
+      try {
+        const precioVenta = parseFloat(document.getElementById('precio-venta')?.value) || 0;
+        const rendimientoIngredientes = parseFloat(document.getElementById('rendimiento-ingredientes')?.value) || 0;
+        const costoUnitarioExtra = parseFloat(document.getElementById('costo-unitario-extra')?.value) || 0;
+        
+        const ingredientes = JSON.parse(localStorage.getItem('ingredients') || '[]');
+        const costoTotalIngredientes = ingredientes.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0);
+        
+        const analisisDiv = document.getElementById('analisis-precio');
+        const resultadoSpan = document.getElementById('resultado-analisis');
+        
+        if (rendimientoIngredientes <= 0) {
+          if (analisisDiv) {
+            analisisDiv.style.display = 'block';
+            analisisDiv.style.backgroundColor = '#FFF3E0';
+            analisisDiv.style.borderLeft = '4px solid #FF9800';
+            resultadoSpan.style.color = '#E65100';
+            resultadoSpan.innerHTML = '⚠️ Debes ingresar la cantidad que produces con tus ingredientes';
+          }
+          return;
+        }
+        
+        const costoUnitarioIngredientes = costoTotalIngredientes / rendimientoIngredientes;
+        const costoTotalUnitario = costoUnitarioIngredientes + costoUnitarioExtra;
+        
+        if (analisisDiv && resultadoSpan) {
+          analisisDiv.style.display = 'block';
+          
+          // Caso especial: Costos cero (ingredientes de la naturaleza)
+          if (costoTotalUnitario === 0) {
+            if (precioVenta > 0) {
+              analisisDiv.style.backgroundColor = '#E8F5E8';
+              analisisDiv.style.borderLeft = '4px solid #4CAF50';
+              resultadoSpan.style.color = '#2E7D32';
+              resultadoSpan.innerHTML = `🌟 EXCELENTE: S/${precioVenta.toFixed(2)} de ganancia pura por unidad.<br>
+                <small>💡 <strong>Análisis:</strong> Al no tener costos de ingredientes (productos naturales), 
+                cualquier precio que pongas será ganancia. ¡Aprovecha esta ventaja competitiva!</small>`;
+            } else {
+              analisisDiv.style.backgroundColor = '#FFF3E0';
+              analisisDiv.style.borderLeft = '4px solid #FF9800';
+              resultadoSpan.style.color = '#E65100';
+              resultadoSpan.innerHTML = '💭 Ingresa un precio de venta para ver tu ganancia potencial';
+            }
+            return;
+          }
+          
+          // Casos normales con costos
+          if (precioVenta > 0) {
+            if (precioVenta > costoTotalUnitario) {
+              const ganancia = precioVenta - costoTotalUnitario;
+              const porcentajeGanancia = ((ganancia / costoTotalUnitario) * 100).toFixed(1);
+              const margenGanancia = ((ganancia / precioVenta) * 100).toFixed(1);
+              
+              analisisDiv.style.backgroundColor = '#E8F5E8';
+              analisisDiv.style.borderLeft = '4px solid #4CAF50';
+              resultadoSpan.style.color = '#2E7D32';
+              
+              let mensaje = `✅ <strong>GANANCIA:</strong> S/${ganancia.toFixed(2)} por unidad<br>`;
+              mensaje += `📊 <strong>Análisis:</strong> ${margenGanancia}% de margen de ganancia`;
+              
+              if (parseFloat(porcentajeGanancia) > 100) {
+                mensaje += `<br>🚀 <strong>Excelente:</strong> Duplicas tu inversión con más del 100% de ganancia`;
+              } else if (parseFloat(porcentajeGanancia) > 50) {
+                mensaje += `<br>👍 <strong>Muy bueno:</strong> Ganancia saludable del ${porcentajeGanancia}%`;
+              } else if (parseFloat(porcentajeGanancia) > 20) {
+                mensaje += `<br>✓ <strong>Aceptable:</strong> Ganancia moderada del ${porcentajeGanancia}%`;
+              } else {
+                mensaje += `<br>⚠️ <strong>Cuidado:</strong> Ganancia baja (${porcentajeGanancia}%). Considera aumentar el precio`;
+              }
+              
+              resultadoSpan.innerHTML = mensaje;
+              
+            } else if (precioVenta < costoTotalUnitario) {
+              const perdida = costoTotalUnitario - precioVenta;
+              const porcentajePerdida = ((perdida / costoTotalUnitario) * 100).toFixed(1);
+              
+              analisisDiv.style.backgroundColor = '#FFEBEE';
+              analisisDiv.style.borderLeft = '4px solid #F44336';
+              resultadoSpan.style.color = '#C62828';
+              
+              let mensaje = `❌ <strong>PÉRDIDA:</strong> S/${perdida.toFixed(2)} por unidad<br>`;
+              mensaje += `📉 <strong>Análisis:</strong> Pierdes ${porcentajePerdida}% de tu inversión<br>`;
+              mensaje += `💡 <strong>Recomendación:</strong> Aumenta el precio a mínimo S/${costoTotalUnitario.toFixed(2)} para no perder`;
+              
+              resultadoSpan.innerHTML = mensaje;
+              
+            } else {
+              analisisDiv.style.backgroundColor = '#FFF3E0';
+              analisisDiv.style.borderLeft = '4px solid #FF9800';
+              resultadoSpan.style.color = '#E65100';
+              resultadoSpan.innerHTML = `⚠️ <strong>PUNTO MUERTO:</strong> Sin ganancia ni pérdida<br>
+                <small>💭 <strong>Consejo:</strong> Aumenta el precio aunque sea S/0.10 para obtener ganancia</small>`;
+            }
+          } else {
+            analisisDiv.style.backgroundColor = '#FFF3E0';
+            analisisDiv.style.borderLeft = '4px solid #FF9800';
+            resultadoSpan.style.color = '#E65100';
+            resultadoSpan.innerHTML = `💭 Ingresa un precio de venta para analizar si tendrás ganancia o pérdida<br>
+              <small>💡 <strong>Costo por unidad:</strong> S/${costoTotalUnitario.toFixed(2)}</small>`;
+          }
+        }
+      } catch (error) {
+        console.error('Error al analizar precio de venta:', error);
+      }
+    }
+    
     // Llamada inicial para actualizar el resumen al cargar la página
     updateSummary();
+    
+    // Actualizar costos de punto de equilibrio al cambiar de pestaña
+    window.updateBreakevenCosts = updateBreakevenCosts;
 
     // --- FUNCIONALIDAD DE IMPRESIÓN ---
+    
+    // Función para actualizar la vista de impresión cuando se cambia a esa pestaña
+    function updatePrintView() {
+      console.log('Actualizando vista de impresión automáticamente...');
+      // Simplemente llamamos a preparePrintView que ya hace todo el trabajo
+      preparePrintView();
+      // Mostrar mensaje sutil de que se actualizó
+      showToast('Vista previa actualizada automáticamente', 'success');
+    }
+    
     document.getElementById('prepare-print-btn').addEventListener('click', preparePrintView);
     document.getElementById('print-btn').addEventListener('click', () => {
         window.print();
@@ -2103,51 +2744,41 @@
     const printContent = document.getElementById('print-content');
     const recipeTitle = localStorage.getItem('recipe-title') || 'Mi Receta';
     const chefName = localStorage.getItem('chef-name') || 'Chef';
-  // Usar el mismo campo de chef para mostrar como "Realizado por"
-  const studentName = chefName;
+    // Usar el mismo campo de chef para mostrar como "Realizado por"
+    const studentName = chefName;
+    const reportLogo = localStorage.getItem('report-logo'); // Obtener logo guardado
     const ingredientes = JSON.parse(localStorage.getItem('ingredients')) || [];
     const pasos = JSON.parse(localStorage.getItem('steps')) || [];
     const fotosAntes = JSON.parse(localStorage.getItem('before-photos-photos')) || [];
     const fotosDurante = JSON.parse(localStorage.getItem('during-photos-photos')) || [];
     const fotosDespues = JSON.parse(localStorage.getItem('after-photos-photos')) || [];
-    const bitacoraEntries = JSON.parse(localStorage.getItem('bitacora')) || [];
+    const bitacoraEntries = JSON.parse(localStorage.getItem('logbook-entries')) || [];
+
+    // Información del sistema de fotos
+    const isOnlineStatus = isOnline();
+    const maxPhotos = getMaxPhotos();
+    const totalFotos = fotosAntes.length + fotosDurante.length + fotosDespues.length;
 
     let costoTotal = 0;
     if (ingredientes.length > 0) {
       costoTotal = ingredientes.reduce((sum, item) => sum + (item.price || 0), 0);
     }
-    const precioVenta = costoTotal * 1.3;
+    
+    // Obtener datos del punto de equilibrio guardados
+    const puntoEquilibrioUnidades = localStorage.getItem('puntoEquilibrioUnidades') || '0';
+    const puntoEquilibrioIngresos = localStorage.getItem('puntoEquilibrioIngresos') || '0.00';
+    const costosFijos = localStorage.getItem('costosFijos') || '0';
+    const precioVenta = localStorage.getItem('precioVenta') || (costoTotal * 1.3).toFixed(2);
 
-    // Intentar regenerar el gráfico si no existe la imagen
-    let chartImage = localStorage.getItem('breakevenChartImage');
-    if (!chartImage && window.generarGraficoPuntoEquilibrio) {
-      // Obtener los valores actuales de la sección de resultado
-      const costosFijos = parseFloat(document.getElementById('costos-fijos')?.value) || 0;
-      const costoUnitarioExtra = parseFloat(document.getElementById('costo-unitario-extra')?.value) || 0;
-      const precioVentaInput = parseFloat(document.getElementById('precio-venta')?.value) || 0;
-      const cantidadProducida = parseFloat(document.getElementById('cantidad-producida')?.value) || 0;
-      let costoVariableUnitario = cantidadProducida > 0 ? (costoTotal / cantidadProducida) : 0;
-      costoVariableUnitario += costoUnitarioExtra;
-      let unidadesEquilibrio = (precioVentaInput - costoVariableUnitario) > 0 ? (costosFijos / (precioVentaInput - costoVariableUnitario)) : 0;
-      unidadesEquilibrio = Math.max(0, Math.round(unidadesEquilibrio));
-      // Crear canvas temporal oculto
-      let tempCanvas = document.createElement('canvas');
-      tempCanvas.width = 600;
-      tempCanvas.height = 400;
-      tempCanvas.style.display = 'none';
-      document.body.appendChild(tempCanvas);
-      tempCanvas.id = 'break-even-chart-temp';
-      // Generar el gráfico en el canvas temporal
-      const ok = window.generarGraficoPuntoEquilibrio(costosFijos, costoVariableUnitario, precioVentaInput, unidadesEquilibrio, tempCanvas);
-      if (ok) {
-        chartImage = tempCanvas.toDataURL('image/png');
-        localStorage.setItem('breakevenChartImage', chartImage);
-      }
-      document.body.removeChild(tempCanvas);
-    }
+    // Crear encabezado con logo si existe
+    const logoSection = reportLogo ? `
+      <div style="text-align: center; margin-bottom: 20px;">
+        <img src="${reportLogo}" alt="Logo" style="max-height: 80px; max-width: 200px; object-fit: contain;">
+      </div>
+    ` : '';
 
     let html = `
-
+            ${logoSection}
             <h1 class="print-title">${recipeTitle}</h1>
             ${studentName ? `<p class="meta-info"><strong>Realizado por:</strong> ${studentName}</p>` : ''}
             <p class="meta-info">Creado el: ${new Date().toLocaleDateString('es-PE')}</p>
@@ -2207,22 +2838,59 @@
             </div>
 
             <div class="print-section">
-                <h2>Bitácora</h2>
-                ${bitacoraEntries.map(entry => `
+                <h2>Bitácora de Trabajo</h2>
+                ${bitacoraEntries.length > 0 ? bitacoraEntries.map(entry => `
                     <div class="logbook-entry">
-                        <p><strong>Fecha:</strong> ${new Date(entry.date).toLocaleString('es-PE')}</p>
-                        <p><strong>${entry.title} (${entry.category})</strong></p>
-                        <p>${entry.text}</p>
-                        ${entry.location ? `<p><small>Ubicación: ${entry.location}</small></p>` : ''}
+                        <p><strong>Fecha:</strong> ${new Date(entry.date).toLocaleDateString('es-PE')}</p>
+                        <p><strong>Título:</strong> ${entry.title}</p>
+                        <p><strong>Categoría:</strong> ${entry.category}</p>
+                        <p><strong>Descripción:</strong> ${entry.text}</p>
+                        ${entry.lastModified ? '<p><small style="color: #FF9800;"><strong>Nota:</strong> Esta anotación fue editada</small></p>' : ''}
                     </div>
-                `).join('') || '<p>No hay anotaciones en la bitácora.</p>'}
+                `).join('') : '<p>No hay anotaciones en la bitácora.</p>'}
+            </div>
+            
+            <div class="print-section">
+                <h2>Información del Sistema</h2>
+                <div class="print-grid">
+                    <div class="print-card">
+                        <strong>Estado de Conexión:</strong><br>
+                        📡 ${isOnlineStatus ? 'Online' : 'Offline'}<br>
+                        <small>Máximo fotos permitidas: ${maxPhotos}</small>
+                    </div>
+                    <div class="print-card">
+                        <strong>Fotos Almacenadas:</strong><br>
+                        📸 ${totalFotos} de ${maxPhotos * 3} máximo<br>
+                        <small>ANTES: ${fotosAntes.length}, DURANTE: ${fotosDurante.length}, DESPUÉS: ${fotosDespues.length}</small>
+                    </div>
+                    <div class="print-card">
+                        <strong>Estadísticas:</strong><br>
+                        🥘 ${ingredientes.length} ingredientes<br>
+                        📝 ${pasos.length} pasos<br>
+                        📔 ${bitacoraEntries.length} anotaciones
+                    </div>
+                </div>
             </div>
 
             <div class="print-section">
                 <h2>Análisis de Costos y Punto de Equilibrio</h2>
-                <p><strong>Costo total de ingredientes:</strong> S/${costoTotal.toFixed(2)}</p>
-                <p><strong>Precio sugerido de venta (30% margen):</strong> S/${precioVenta.toFixed(2)}</p>
-                ${chartImage ? `<div class="chart-container" style="text-align:center; margin-top:16px;"><img src="${chartImage}" alt="Gráfico de Punto de Equilibrio" style="max-width:100%; border-radius:8px;"></div>` : '<p>No se ha generado el gráfico de punto de equilibrio.</p>'}
+                <div class="print-grid">
+                    <div class="print-card">
+                        <strong>Costos:</strong><br>
+                        Ingredientes: S/${costoTotal.toFixed(2)}<br>
+                        Costos Fijos: S/${costosFijos}<br>
+                        <small>Precio sugerido: S/${precioVenta}</small>
+                    </div>
+                    <div class="print-card">
+                        <strong>Punto de Equilibrio:</strong><br>
+                        🎯 ${puntoEquilibrioUnidades} unidades<br>
+                        💰 S/${puntoEquilibrioIngresos}<br>
+                        <small>Para no tener pérdidas</small>
+                    </div>
+                </div>
+                <div id="breakeven-chart-print" style="margin-top:16px; text-align:center;">
+                  <!-- El gráfico SVG se copiará aquí -->
+                </div>
                 <div style="margin-top:32px; text-align:center;">
                   <h3 style="color:#1976d2; font-size:18px; margin-bottom:8px;">Gráfica para dibujar el Punto de Equilibrio</h3>
                   <div style="overflow-x:auto; display:inline-block; max-width:100%;">
@@ -2262,6 +2930,27 @@
         `;
 
         printContent.innerHTML = html;
+        
+        // Copiar el gráfico SVG del resultado a la vista de impresión
+        const chartContainer = document.getElementById('breakeven-chart-container');
+        const printChartContainer = document.getElementById('breakeven-chart-print');
+        
+        if (chartContainer && printChartContainer) {
+          const svgChart = chartContainer.querySelector('svg');
+          if (svgChart) {
+            printChartContainer.innerHTML = `
+              <h3 style="color:#1976d2; margin-bottom:8px;">Gráfico de Punto de Equilibrio</h3>
+              ${svgChart.outerHTML}
+            `;
+          } else {
+            printChartContainer.innerHTML = `
+              <p style="color:#666; font-style:italic;">
+                Gráfico no disponible. Genera el punto de equilibrio en la sección "Resultado".
+              </p>
+            `;
+          }
+        }
+        
     // --- DOP SVG para impresión ---
     function generarDOPSVG(pasos) {
       const circleRadius = 30;
@@ -2335,7 +3024,291 @@
 
     // Botón de borrar todo
     const resetAllButton = document.getElementById('reset-all-header');
+    
+    // --- BITÁCORA DE TRABAJO ---
+    // Variables ya inicializadas al principio
+    
+    // Las anotaciones ya fueron cargadas al inicio
+    if (logbookEntries.length > 0) {
+      console.log('Cargando anotaciones de bitácora al inicio:', logbookEntries.length);
+      updateLogbookList();
+    } else {
+      console.log('No hay anotaciones de bitácora para cargar');
+    }
+
+    // Establecer fecha actual por defecto
+    const logbookDateInput = document.getElementById('logbook-date');
+    if (logbookDateInput) {
+      const today = new Date().toISOString().split('T')[0];
+      logbookDateInput.value = today;
+    }
+
+    // Manejar el botón de agregar anotación
+    const addLogbookEntryBtn = document.getElementById('add-logbook-entry');
+    if (addLogbookEntryBtn) {
+      addLogbookEntryBtn.addEventListener('click', function() {
+        const date = document.getElementById('logbook-date').value;
+        const title = document.getElementById('logbook-title').value.trim();
+        const category = document.getElementById('logbook-category').value;
+        const text = document.getElementById('logbook-text').value.trim();
+        
+        if (!date || !title || !text) {
+          showToast('Por favor completa todos los campos obligatorios', 'error');
+          return;
+        }
+        
+        if (editingLogbookIndex !== -1) {
+          // Modo edición: actualizar la anotación existente en su posición original
+          const entry = logbookEntries[editingLogbookIndex];
+          entry.date = date;
+          entry.title = title;
+          entry.category = category;
+          entry.text = text;
+          entry.lastModified = new Date().toISOString();
+          
+          editingLogbookIndex = -1; // Resetear el índice de edición
+          
+          // Restaurar botones a su estado normal
+          restoreLogbookButtons();
+          
+          saveLogbookEntries();
+          updateLogbookList();
+          clearLogbookForm();
+          showToast('Anotación actualizada correctamente');
+          return;
+        }
+        
+        // Modo agregar: crear nueva anotación
+        // Obtener ubicación si es posible
+        const entry = {
+          id: Date.now(),
+          date: date,
+          title: title,
+          category: category,
+          text: text,
+          timestamp: new Date().toISOString()
+        };
+        
+        logbookEntries.push(entry);
+        saveLogbookEntries();
+        updateLogbookList();
+        clearLogbookForm();
+        showToast('Anotación agregada exitosamente');
+      });
+    }
+
+    // Función para guardar entradas en localStorage
+    function saveLogbookEntries() {
+      localStorage.setItem('logbook-entries', JSON.stringify(logbookEntries));
+      // Actualizar el resumen cuando se guarden cambios en la bitácora
+      if (typeof updateSummary === 'function') {
+        updateSummary();
+      }
+    }
+
+    // Función para limpiar el formulario de bitácora
+    function clearLogbookForm() {
+      document.getElementById('logbook-title').value = '';
+      document.getElementById('logbook-text').value = '';
+      document.getElementById('logbook-category').selectedIndex = 0;
+      // Mantener la fecha actual
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('logbook-date').value = today;
+    }
+
+    // Función para restaurar botones a su estado normal
+    function restoreLogbookButtons() {
+      const addButton = document.getElementById('add-logbook-entry');
+      const cancelButton = document.getElementById('cancel-edit-logbook');
+      
+      if (addButton) {
+        addButton.innerHTML = '<span class="material-icons">add</span> Agregar Anotación';
+        addButton.style.backgroundColor = ''; // Restaurar color original
+      }
+      
+      if (cancelButton) {
+        cancelButton.style.display = 'none'; // Ocultar botón cancelar
+      }
+    }
+
+    // Función para cancelar la edición de bitácora
+    function cancelLogbookEdit() {
+      editingLogbookIndex = -1;
+      clearLogbookForm();
+      restoreLogbookButtons();
+      showToast('Edición de anotación cancelada');
+    }
+
+    // Asignar evento al botón cancelar bitácora
+    const cancelEditLogbookButton = document.getElementById('cancel-edit-logbook');
+    if (cancelEditLogbookButton) {
+      cancelEditLogbookButton.addEventListener('click', cancelLogbookEdit);
+    }
+
+    // Función para actualizar la lista de anotaciones
+    function updateLogbookList() {
+      const logbookList = document.getElementById('logbook-entries-list');
+      if (!logbookList) return;
+      
+      logbookList.innerHTML = '';
+      
+      if (logbookEntries.length === 0) {
+        logbookList.innerHTML = '<p style="text-align:center; color:var(--text-secondary); padding:16px;">No hay anotaciones en la bitácora</p>';
+        return;
+      }
+      
+      // Ordenar por fecha más reciente primero
+      const sortedEntries = [...logbookEntries].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      
+      sortedEntries.forEach(entry => {
+        const li = document.createElement('li');
+        li.className = 'list-item logbook-entry-item';
+        li.style.marginBottom = '16px';
+        li.style.padding = '18px';
+        li.style.backgroundColor = '#f8f9fa';
+        li.style.borderRadius = '12px';
+        li.style.borderLeft = '4px solid var(--primary-color)';
+        li.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
+        
+        const categoryNames = {
+          'materiales': 'Materiales/Ingredientes',
+          'equipo': 'Equipo de trabajo',
+          'proceso': 'Proceso de preparación',
+          'cliente': 'Cliente/Requisitos',
+          'otro': 'Otro'
+        };
+        
+        li.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+            <div style="flex: 1; min-width: 0; margin-right: 12px;">
+              <h4 style="margin: 0 0 8px 0; color: var(--primary-color); font-size: 17px; font-weight: 600; word-wrap: break-word; line-height: 1.3;">${entry.title}</h4>
+              <div style="display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: #666; margin-bottom: 8px;">
+                <span style="display: flex; align-items: center; gap: 4px;">
+                  <span class="material-icons" style="font-size: 14px;">calendar_today</span>
+                  <strong>Fecha:</strong> ${new Date(entry.date).toLocaleDateString('es-PE')}
+                </span>
+                <span style="display: flex; align-items: center; gap: 4px;">
+                  <span class="material-icons" style="font-size: 14px;">category</span>
+                  <strong>Categoría:</strong> ${categoryNames[entry.category] || entry.category}
+                </span>
+                ${entry.lastModified ? '<span style="color: #FF9800; font-weight: bold; display: flex; align-items: center; gap: 4px;"><span class="material-icons" style="font-size: 14px;">edit</span>Editado</span>' : ''}
+              </div>
+            </div>
+            <div class="logbook-action-buttons" style="display: flex; gap: 8px; flex-shrink: 0;">
+              <button onclick="editLogbookEntry(${entry.id})" 
+                      style="background: #FF9800; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 11px; display: flex; align-items: center; gap: 4px; min-width: 70px; justify-content: center;"
+                      onmouseover="this.style.backgroundColor='#F57C00'" 
+                      onmouseout="this.style.backgroundColor='#FF9800'"
+                      title="Editar anotación">
+                <span class="material-icons" style="font-size: 16px;">edit</span>
+                <span style="font-size: 10px; font-weight: 600;">EDITAR</span>
+              </button>
+              <button onclick="deleteLogbookEntry(${entry.id})" 
+                      style="background: #f44336; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 11px; display: flex; align-items: center; gap: 4px; min-width: 70px; justify-content: center;"
+                      onmouseover="this.style.backgroundColor='#D32F2F'" 
+                      onmouseout="this.style.backgroundColor='#f44336'"
+                      title="Eliminar anotación">
+                <span class="material-icons" style="font-size: 16px;">delete</span>
+                <span style="font-size: 10px; font-weight: 600;">ELIMINAR</span>
+              </button>
+            </div>
+          </div>
+          <p style="margin: 0 0 12px 0; line-height: 1.6; color: #333; word-wrap: break-word; background-color: #fff; padding: 12px; border-radius: 8px; border-left: 3px solid #e0e0e0;">${entry.text}</p>
+        `;
+        
+        logbookList.appendChild(li);
+      });
+    }
+
+    // Función global para eliminar entrada de bitácora
+    window.deleteLogbookEntry = function(id) {
+      if (confirm('¿Estás seguro de que quieres eliminar esta anotación?')) {
+        logbookEntries = logbookEntries.filter(entry => entry.id !== id);
+        saveLogbookEntries();
+        updateLogbookList();
+        showToast('Anotación eliminada');
+      }
+    };
+
+    // Función global para editar entrada de bitácora
+    window.editLogbookEntry = function(id) {
+      // Buscar la entrada y su índice en el array original (sin ordenar)
+      const entryIndex = logbookEntries.findIndex(entry => entry.id === id);
+      const entry = logbookEntries[entryIndex];
+      
+      if (entry && entryIndex !== -1) {
+        // Guardar la posición de la anotación que se está editando
+        editingLogbookIndex = entryIndex;
+        
+        // Llenar el formulario con los datos de la anotación
+        document.getElementById('logbook-date').value = entry.date;
+        document.getElementById('logbook-title').value = entry.title;
+        document.getElementById('logbook-category').value = entry.category;
+        document.getElementById('logbook-text').value = entry.text;
+        
+        // Cambiar el botón para indicar que se está editando
+        const addButton = document.getElementById('add-logbook-entry');
+        const cancelButton = document.getElementById('cancel-edit-logbook');
+        
+        if (addButton) {
+          addButton.innerHTML = '<span class="material-icons">edit</span> Actualizar Anotación';
+          addButton.style.backgroundColor = '#FF9800'; // Color naranja para edición
+        }
+        
+        if (cancelButton) {
+          cancelButton.style.display = 'block'; // Mostrar botón cancelar
+        }
+        
+        // Scroll al formulario
+        document.getElementById('logbook-date').scrollIntoView({behavior: 'smooth'});
+        document.getElementById('logbook-title').focus();
+        
+        showToast('Editando anotación: ' + entry.title, 'warning');
+      }
+    };
+    
     // --- PUNTO DE EQUILIBRIO ---
+    
+    // Event listeners para actualizar análisis en tiempo real
+    const precioVentaInput = document.getElementById('precio-venta');
+    const cantidadProducidaInput = document.getElementById('cantidad-producida');
+    const costoUnitarioExtraInput = document.getElementById('costo-unitario-extra');
+    const rendimientoIngredientesInput = document.getElementById('rendimiento-ingredientes');
+    const costosFijosInput = document.getElementById('costos-fijos');
+    
+    if (precioVentaInput) {
+      precioVentaInput.addEventListener('input', () => {
+        updateBreakevenCosts();
+      });
+    }
+    
+    if (cantidadProducidaInput) {
+      cantidadProducidaInput.addEventListener('input', () => {
+        updateBreakevenCosts();
+      });
+    }
+    
+    if (costoUnitarioExtraInput) {
+      costoUnitarioExtraInput.addEventListener('input', () => {
+        updateBreakevenCosts();
+      });
+    }
+    
+    if (rendimientoIngredientesInput) {
+      rendimientoIngredientesInput.addEventListener('input', () => {
+        updateBreakevenCosts();
+      });
+    }
+    
+    if (costosFijosInput) {
+      costosFijosInput.addEventListener('input', () => {
+        updateBreakevenCosts();
+      });
+    }
+
+    // --- PUNTO DE EQUILIBRIO ---
+    
+    // Botón para calcular punto de equilibrio
     const calcularBtn = document.getElementById('calcular-equilibrio');
     if (calcularBtn) {
       calcularBtn.addEventListener('click', () => {
@@ -2343,35 +3316,146 @@
         const costoUnitarioExtra = parseFloat(document.getElementById('costo-unitario-extra').value) || 0;
         const precioVenta = parseFloat(document.getElementById('precio-venta').value) || 0;
         const cantidadProducida = parseFloat(document.getElementById('cantidad-producida').value) || 0;
+        
+        // Validaciones básicas
+        if (precioVenta <= 0) {
+          showToast('El precio de venta debe ser mayor a 0', 'error');
+          return;
+        }
+        
+        if (cantidadProducida <= 0) {
+          showToast('Debes especificar cuántas unidades rinden los ingredientes', 'error');
+          return;
+        }
+        
         // Calcular costo variable unitario (ingredientes + extra)
         let ingredientes = JSON.parse(localStorage.getItem('ingredients') || '[]');
-        let costoTotalIngredientes = ingredientes.reduce((sum, item) => sum + (item.price || 0), 0);
-        let costoVariableUnitario = cantidadProducida > 0 ? (costoTotalIngredientes / cantidadProducida) : 0;
+        let costoTotalIngredientes = ingredientes.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0);
+        
+        // Validar que tengamos ingredientes
+        if (costoTotalIngredientes <= 0) {
+          showToast('Primero debes agregar ingredientes con precios en la pestaña correspondiente', 'error');
+          return;
+        }
+        
+        // El costo variable unitario usa la cantidad que realmente rinden los ingredientes
+        let costoVariableUnitario = costoTotalIngredientes / cantidadProducida;
         costoVariableUnitario += costoUnitarioExtra;
+        
+        // Validar que el precio de venta sea mayor al costo variable unitario
+        if (precioVenta <= costoVariableUnitario) {
+          showToast('El precio de venta debe ser mayor al costo variable unitario (S/' + costoVariableUnitario.toFixed(2) + ')', 'error');
+          return;
+        }
+        
         // Calcular punto de equilibrio
-        let unidadesEquilibrio = (precioVenta - costoVariableUnitario) > 0 ? (costosFijos / (precioVenta - costoVariableUnitario)) : 0;
-        unidadesEquilibrio = Math.max(0, Math.round(unidadesEquilibrio));
+        let unidadesEquilibrio = costosFijos / (precioVenta - costoVariableUnitario);
+        unidadesEquilibrio = Math.max(0, Math.ceil(unidadesEquilibrio));
         let ingresosEquilibrio = unidadesEquilibrio * precioVenta;
+        
         // Mostrar en la UI
-        document.getElementById('punto-equilibrio-unidades').textContent = unidadesEquilibrio;
+        document.getElementById('punto-equilibrio-unidades').textContent = unidadesEquilibrio.toLocaleString();
         document.getElementById('punto-equilibrio-ingresos').textContent = 'S/' + ingresosEquilibrio.toFixed(2);
+        
         // Guardar en localStorage
         localStorage.setItem('puntoEquilibrioUnidades', unidadesEquilibrio);
-        localStorage.setItem('puntoEquilibrioIngresos', ingresosEquilibrio);
-        // Generar gráfico y guardar imagen
+        localStorage.setItem('puntoEquilibrioIngresos', ingresosEquilibrio.toFixed(2));
+        localStorage.setItem('costoVariableUnitario', costoVariableUnitario.toFixed(2));
+        localStorage.setItem('costosFijos', costosFijos.toFixed(2));
+        localStorage.setItem('precioVenta', precioVenta.toFixed(2));
+        
+        // Generar gráfico SVG simple
         if (window.generarGraficoPuntoEquilibrio) {
-          setTimeout(() => {
+          try {
+            console.log('Generando gráfico SVG con datos:', {
+              costosFijos, costoVariableUnitario, precioVenta, unidadesEquilibrio
+            });
             const ok = window.generarGraficoPuntoEquilibrio(costosFijos, costoVariableUnitario, precioVenta, unidadesEquilibrio);
             if (ok) {
-              const canvas = document.getElementById('break-even-chart');
-              if (canvas) {
-                const imgData = canvas.toDataURL('image/png');
-                localStorage.setItem('breakevenChartImage', imgData);
-              }
+              console.log('Gráfico SVG generado exitosamente');
             }
-          }, 300);
+          } catch (error) {
+            console.error('Error al generar gráfico SVG:', error);
+          }
         }
-        showToast('Punto de equilibrio calculado');
+        
+        showToast('Punto de equilibrio calculado correctamente');
+      });
+    }
+
+    // Cargar valores guardados del punto de equilibrio al iniciar
+    function loadBreakevenData() {
+      const costosFijos = localStorage.getItem('costosFijos');
+      const costoUnitarioExtra = localStorage.getItem('costoUnitarioExtra');
+      const precioVenta = localStorage.getItem('precioVenta');
+      const cantidadProducida = localStorage.getItem('cantidadProducida');
+      const puntoEquilibrioUnidades = localStorage.getItem('puntoEquilibrioUnidades');
+      const puntoEquilibrioIngresos = localStorage.getItem('puntoEquilibrioIngresos');
+      
+      if (costosFijos) document.getElementById('costos-fijos').value = costosFijos;
+      if (costoUnitarioExtra) document.getElementById('costo-unitario-extra').value = costoUnitarioExtra;
+      if (precioVenta) document.getElementById('precio-venta').value = precioVenta;
+      if (cantidadProducida) document.getElementById('cantidad-producida').value = cantidadProducida;
+      if (puntoEquilibrioUnidades) document.getElementById('punto-equilibrio-unidades').textContent = puntoEquilibrioUnidades;
+      if (puntoEquilibrioIngresos) document.getElementById('punto-equilibrio-ingresos').textContent = 'S/' + puntoEquilibrioIngresos;
+    }
+    
+    // Guardar valores cuando cambian los inputs
+    function setupBreakevenInputListeners() {
+      const inputs = ['costos-fijos', 'costo-unitario-extra', 'precio-venta', 'cantidad-producida'];
+      inputs.forEach(inputId => {
+        const input = document.getElementById(inputId);
+        if (input) {
+          input.addEventListener('input', () => {
+            localStorage.setItem(inputId.replace('-', ''), input.value);
+          });
+        }
+      });
+    }
+    
+    // Cargar datos y configurar listeners
+    loadBreakevenData();
+    setupBreakevenInputListeners();
+    
+    // --- MANEJO DEL LOGO DEL REPORTE ---
+    const reportLogoInput = document.getElementById('report-logo');
+    const logoPreview = document.getElementById('logo-preview');
+    const logoImage = document.getElementById('logo-image');
+    const removeLogo = document.getElementById('remove-logo');
+    
+    // Cargar logo guardado
+    const savedLogo = localStorage.getItem('report-logo');
+    if (savedLogo) {
+      logoImage.src = savedLogo;
+      logoPreview.style.display = 'flex';
+    }
+    
+    // Manejar carga de nuevo logo
+    if (reportLogoInput) {
+      reportLogoInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const logoData = e.target.result;
+            localStorage.setItem('report-logo', logoData);
+            logoImage.src = logoData;
+            logoPreview.style.display = 'flex';
+            showToast('Logo cargado correctamente');
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+    
+    // Remover logo
+    if (removeLogo) {
+      removeLogo.addEventListener('click', function() {
+        localStorage.removeItem('report-logo');
+        logoImage.src = '';
+        logoPreview.style.display = 'none';
+        reportLogoInput.value = '';
+        showToast('Logo removido');
       });
     }
 });

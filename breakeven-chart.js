@@ -2,7 +2,30 @@
 let breakEvenChart = null;
 
 function generarGraficoPuntoEquilibrio(costosFijos, costoVariableUnitario, precioVenta, unidadesEquilibrio, canvasArg) {
+  // Verificar que Chart.js esté disponible
+  if (typeof Chart === 'undefined') {
+    console.error('Chart.js no está disponible. Esperando a que se cargue...');
+    setTimeout(() => {
+      generarGraficoPuntoEquilibrio(costosFijos, costoVariableUnitario, precioVenta, unidadesEquilibrio, canvasArg);
+    }, 500);
+    return false;
+  }
+
+  // Validación: no graficar si el precio de venta es menor o igual al costo variable unitario
+  if (precioVenta <= costoVariableUnitario) {
+    const chartContainer = document.getElementById('chart-container');
+    if (chartContainer) {
+      chartContainer.innerHTML = `<div style="padding: 20px; text-align: center; color: #f44336;">
+        <span class="material-icons" style="font-size: 48px;">error_outline</span>
+        <p>No se puede graficar el punto de equilibrio.<br>El precio de venta debe ser mayor al costo variable unitario.</p>
+        <p><small>Precio de venta: S/${precioVenta.toFixed(2)} - Costo variable unitario: S/${costoVariableUnitario.toFixed(2)}</small></p>
+      </div>`;
+    }
+    return false;
+  }
+  
   console.log('Iniciando generación del gráfico de punto de equilibrio...');
+  console.log('Datos:', { costosFijos, costoVariableUnitario, precioVenta, unidadesEquilibrio });
   
   try {
       // Permitir pasar un canvas opcional (para impresión)
@@ -11,11 +34,14 @@ function generarGraficoPuntoEquilibrio(costosFijos, costoVariableUnitario, preci
       console.error('Error: El canvas no existe en el DOM');
       return false;
     }
-      if (canvas.clientWidth === 0 && canvas.clientHeight === 0 && !canvasArg) {
-      console.warn('El canvas tiene dimensiones de 0, puede que no esté visible');
+    
+    // Asegurar que el canvas tenga dimensiones
+    if (canvas.clientWidth === 0 && canvas.clientHeight === 0 && !canvasArg) {
+      console.warn('El canvas tiene dimensiones de 0, ajustando...');
       canvas.style.width = '100%';
       canvas.style.height = '400px';
     }
+    
     const ctx = canvas.getContext && canvas.getContext('2d');
     if (!ctx) {
       console.error('No se pudo obtener el contexto del canvas');
