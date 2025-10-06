@@ -618,6 +618,38 @@
       position: absolute;
       top: 8px;
       left: 8px;
+    }
+    
+    .photo-delete-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: rgba(255, 0, 0, 0.8);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      z-index: 10;
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    
+    .photo-item:hover .photo-delete-btn {
+      opacity: 1;
+      transform: scale(1);
+    }
+    
+    .photo-delete-btn:hover {
+      background-color: rgba(255, 0, 0, 1);
+      transform: scale(1.1);
       background-color: var(--primary-color);
       color: white;
       font-weight: 600;
@@ -2035,6 +2067,9 @@
             // Estructura de la foto con metadatos
             div.innerHTML = `
               <div class="photo-number">${categoryPrefix}${photoNumber}</div>
+              <button class="photo-delete-btn" onclick="deletePhoto('${containerId}', ${photoNumber}, '${categoryPrefix}')" title="Eliminar foto">
+                ×
+              </button>
               <img src="${compressedSrc}" alt="Foto ${categoryText} ${photoNumber}">
               <div class="photo-info">
                 <div class="photo-date">${dateTimeString}</div>
@@ -2082,6 +2117,9 @@
             div.className = 'photo-item';
             div.innerHTML = `
               <div class="photo-number">${categoryPrefix}${photoNumber}</div>
+              <button class="photo-delete-btn" onclick="deletePhoto('${containerId}', ${photoNumber}, '${categoryPrefix}')" title="Eliminar foto">
+                ×
+              </button>
               <img src="${compressedSrc}" alt="Foto ${categoryText} ${photoNumber}">
               <div class="photo-info">
                 <div class="photo-date">${dateTimeString}</div>
@@ -2260,6 +2298,9 @@
             // Formato nuevo con metadatos
             div.innerHTML = `
               <div class="photo-number">${photo.prefix || ''}${photo.number || index+1}</div>
+              <button class="photo-delete-btn" onclick="deletePhoto('${containerId}', ${photo.number || index+1}, '${photo.prefix || ''}')" title="Eliminar foto">
+                ×
+              </button>
               <img src="${photo.src}" alt="Foto ${photo.category || ''} ${photo.number || index+1}">
               <div class="photo-info">
                 <div class="photo-date">${photo.date || 'Sin fecha'}</div>
@@ -2275,6 +2316,50 @@
     
     // Ejecutar al cargar
     loadSavedPhotos();
+    
+    // Función para eliminar una foto individual
+    function deletePhoto(containerId, photoNumber, categoryPrefix) {
+      if (confirm('¿Estás seguro de que quieres eliminar esta foto?')) {
+        console.log(`Eliminando foto ${categoryPrefix}${photoNumber} del contenedor ${containerId}`);
+        
+        // Eliminar del localStorage
+        const storageKey = containerId + '-photos';
+        let photos = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        
+        // Encontrar y eliminar la foto del array
+        const photoIndex = photos.findIndex(photo => 
+          (photo.number && photo.number === photoNumber) || 
+          (photo.prefix === categoryPrefix && photo.number === photoNumber)
+        );
+        
+        if (photoIndex !== -1) {
+          photos.splice(photoIndex, 1);
+          localStorage.setItem(storageKey, JSON.stringify(photos));
+          console.log(`Foto eliminada del localStorage. Fotos restantes: ${photos.length}`);
+        }
+        
+        // Eliminar del DOM
+        const container = document.getElementById(containerId);
+        const photoItems = container.querySelectorAll('.photo-item');
+        
+        photoItems.forEach(item => {
+          const numberElement = item.querySelector('.photo-number');
+          if (numberElement && numberElement.textContent === `${categoryPrefix}${photoNumber}`) {
+            item.remove();
+            console.log(`Foto ${categoryPrefix}${photoNumber} eliminada del DOM`);
+          }
+        });
+        
+        // Actualizar la vista de resumen
+        updateSummaryPhotos();
+        
+        // Mostrar confirmación
+        showToast(`Foto ${categoryPrefix}${photoNumber} eliminada exitosamente`, 'success');
+      }
+    }
+    
+    // Hacer la función disponible globalmente
+    window.deletePhoto = deletePhoto;
     
     // Actualizar también las fotos en la sección de resumen
     setTimeout(() => {
@@ -2393,6 +2478,64 @@
             photoNumber.style.fontSize = '12px';
             photoNumber.style.zIndex = '1';
             photoElement.appendChild(photoNumber);
+            
+            // Agregar botón de eliminar en la vista de resumen
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'photo-delete-btn';
+            deleteBtn.innerHTML = '×';
+            deleteBtn.title = 'Eliminar foto';
+            deleteBtn.style.position = 'absolute';
+            deleteBtn.style.top = '8px';
+            deleteBtn.style.right = '8px';
+            deleteBtn.style.backgroundColor = 'rgba(255, 0, 0, 0.8)';
+            deleteBtn.style.color = 'white';
+            deleteBtn.style.border = 'none';
+            deleteBtn.style.borderRadius = '50%';
+            deleteBtn.style.width = '24px';
+            deleteBtn.style.height = '24px';
+            deleteBtn.style.cursor = 'pointer';
+            deleteBtn.style.display = 'flex';
+            deleteBtn.style.alignItems = 'center';
+            deleteBtn.style.justifyContent = 'center';
+            deleteBtn.style.fontSize = '12px';
+            deleteBtn.style.fontWeight = 'bold';
+            deleteBtn.style.transition = 'all 0.3s ease';
+            deleteBtn.style.zIndex = '10';
+            deleteBtn.style.opacity = '0';
+            deleteBtn.style.transform = 'scale(0.8)';
+            
+            // Determinar containerId basado en el storageKey
+            let containerId = '';
+            if (container.storageKey === 'before-photos-photos') containerId = 'before-photos';
+            else if (container.storageKey === 'during-photos-photos') containerId = 'during-photos';
+            else if (container.storageKey === 'after-photos-photos') containerId = 'after-photos';
+            
+            deleteBtn.addEventListener('click', () => {
+              window.deletePhoto(containerId, photo.number, photo.prefix || '');
+            });
+            
+            // Efectos hover para mostrar el botón
+            photoElement.addEventListener('mouseenter', () => {
+              deleteBtn.style.opacity = '1';
+              deleteBtn.style.transform = 'scale(1)';
+            });
+            
+            photoElement.addEventListener('mouseleave', () => {
+              deleteBtn.style.opacity = '0';
+              deleteBtn.style.transform = 'scale(0.8)';
+            });
+            
+            deleteBtn.addEventListener('mouseenter', () => {
+              deleteBtn.style.backgroundColor = 'rgba(255, 0, 0, 1)';
+              deleteBtn.style.transform = 'scale(1.1)';
+            });
+            
+            deleteBtn.addEventListener('mouseleave', () => {
+              deleteBtn.style.backgroundColor = 'rgba(255, 0, 0, 0.8)';
+              deleteBtn.style.transform = 'scale(1)';
+            });
+            
+            photoElement.appendChild(deleteBtn);
           }
           
           // Agregar metadatos (fecha y ubicación)
