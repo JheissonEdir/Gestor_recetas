@@ -3022,9 +3022,6 @@
         });
     }
 
-    // Botón de borrar todo
-    const resetAllButton = document.getElementById('reset-all-header');
-    
     // --- BITÁCORA DE TRABAJO ---
     // Variables ya inicializadas al principio
     
@@ -3457,6 +3454,89 @@
         reportLogoInput.value = '';
         showToast('Logo removido');
       });
+    }
+    
+    // --- FUNCIÓN BORRAR TODO ---
+    const resetAllButton = document.getElementById('reset-all-header');
+    if (resetAllButton) {
+      resetAllButton.addEventListener('click', function() {
+        // Mostrar confirmación antes de borrar
+        const confirmDelete = confirm(
+          '⚠️ ADVERTENCIA: Esto borrará TODA la información de la aplicación\n\n' +
+          '• Ingredientes\n' +
+          '• Pasos de preparación\n' +
+          '• Todas las fotos\n' +
+          '• Bitácora completa\n' +
+          '• Análisis de costos\n' +
+          '• Logo del reporte\n' +
+          '• Configuraciones\n\n' +
+          '¿Estás seguro de que quieres continuar?'
+        );
+        
+        if (confirmDelete) {
+          // Segunda confirmación para estar seguro
+          const finalConfirm = confirm(
+            '🚨 ÚLTIMA CONFIRMACIÓN\n\n' +
+            'Esta acción NO se puede deshacer.\n' +
+            'Se perderán TODOS los datos.\n\n' +
+            '¿Proceder con el borrado completo?'
+          );
+          
+          if (finalConfirm) {
+            borrarTodoCompletamente();
+          }
+        }
+      });
+    }
+    
+    // Función para borrar todo completamente
+    function borrarTodoCompletamente() {
+      try {
+        console.log('🗑️ Iniciando borrado completo de datos...');
+        
+        // 1. Limpiar localStorage completamente
+        const keysToRemove = [
+          'recipe-title', 'chef-name', 'ingredients', 'steps',
+          'before-photos-photos', 'during-photos-photos', 'after-photos-photos',
+          'logbook-entries', 'costosFijos', 'costoUnitarioExtra', 'precioVenta',
+          'cantidadProducida', 'puntoEquilibrioUnidades', 'puntoEquilibrioIngresos',
+          'costoVariableUnitario', 'rendimientoIngredientes', 'report-logo', 'breakevenChartImage'
+        ];
+        
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+        
+        // 2. Limpiar DOM
+        const containers = ['ingredients-list', 'steps-list', 'before-photos', 'during-photos', 'after-photos'];
+        containers.forEach(id => {
+          const element = document.getElementById(id);
+          if (element) element.innerHTML = '';
+        });
+        
+        // 3. Limpiar inputs
+        const inputs = ['recipe-title', 'ingredient-name', 'ingredient-quantity', 'ingredient-unit', 'ingredient-price', 'step-text'];
+        inputs.forEach(id => {
+          const input = document.getElementById(id);
+          if (input) input.value = '';
+        });
+        
+        // 4. Limpiar logo
+        const logoPreview = document.getElementById('logo-preview');
+        if (logoPreview) logoPreview.style.display = 'none';
+        
+        // 5. Actualizar resúmenes
+        updateSummary();
+        updateSummaryPhotos();
+        
+        // 6. Volver a primera pestaña
+        const firstTab = document.querySelector('.nav-tab[data-tab="ingredients"]');
+        if (firstTab) firstTab.click();
+        
+        showToast('✅ Todos los datos han sido borrados. Aplicación lista para empezar de nuevo', 'success');
+        
+      } catch (error) {
+        console.error('❌ Error durante el borrado completo:', error);
+        showToast('Error al borrar los datos. Intenta recargar la página', 'error');
+      }
     }
 });
 </script>
