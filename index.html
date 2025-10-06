@@ -3458,8 +3458,12 @@
     
     // --- FUNCIÓN BORRAR TODO ---
     const resetAllButton = document.getElementById('reset-all-header');
+    console.log('Botón reset encontrado:', resetAllButton);
+    
     if (resetAllButton) {
       resetAllButton.addEventListener('click', function() {
+        console.log('🗑️ Botón Borrar Todo clickeado');
+        
         // Mostrar confirmación antes de borrar
         const confirmDelete = confirm(
           '⚠️ ADVERTENCIA: Esto borrará TODA la información de la aplicación\n\n' +
@@ -3473,6 +3477,8 @@
           '¿Estás seguro de que quieres continuar?'
         );
         
+        console.log('Primera confirmación:', confirmDelete);
+        
         if (confirmDelete) {
           // Segunda confirmación para estar seguro
           const finalConfirm = confirm(
@@ -3482,15 +3488,23 @@
             '¿Proceder con el borrado completo?'
           );
           
+          console.log('Segunda confirmación:', finalConfirm);
+          
           if (finalConfirm) {
+            console.log('Ejecutando borrarTodoCompletamente...');
             borrarTodoCompletamente();
           }
         }
       });
+      console.log('✅ Event listener agregado al botón reset');
+    } else {
+      console.error('❌ Botón reset-all-header no encontrado en el DOM');
     }
     
     // Función para borrar todo completamente
     function borrarTodoCompletamente() {
+      console.log('🗑️ INICIANDO borrarTodoCompletamente()');
+      
       try {
         console.log('🗑️ Iniciando borrado completo de datos...');
         
@@ -3503,34 +3517,65 @@
           'costoVariableUnitario', 'rendimientoIngredientes', 'report-logo', 'breakevenChartImage'
         ];
         
-        keysToRemove.forEach(key => localStorage.removeItem(key));
+        console.log('Removiendo claves de localStorage:', keysToRemove);
+        keysToRemove.forEach(key => {
+          localStorage.removeItem(key);
+          console.log(`✅ Removido: ${key}`);
+        });
         
         // 2. Limpiar DOM
         const containers = ['ingredients-list', 'steps-list', 'before-photos', 'during-photos', 'after-photos'];
+        console.log('Limpiando contenedores DOM:', containers);
         containers.forEach(id => {
           const element = document.getElementById(id);
-          if (element) element.innerHTML = '';
+          if (element) {
+            element.innerHTML = '';
+            console.log(`✅ Limpiado contenedor: ${id}`);
+          } else {
+            console.warn(`⚠️ Contenedor no encontrado: ${id}`);
+          }
         });
         
         // 3. Limpiar inputs
         const inputs = ['recipe-title', 'ingredient-name', 'ingredient-quantity', 'ingredient-unit', 'ingredient-price', 'step-text'];
+        console.log('Limpiando inputs:', inputs);
         inputs.forEach(id => {
           const input = document.getElementById(id);
-          if (input) input.value = '';
+          if (input) {
+            input.value = '';
+            console.log(`✅ Limpiado input: ${id}`);
+          } else {
+            console.warn(`⚠️ Input no encontrado: ${id}`);
+          }
         });
         
         // 4. Limpiar logo
         const logoPreview = document.getElementById('logo-preview');
-        if (logoPreview) logoPreview.style.display = 'none';
+        if (logoPreview) {
+          logoPreview.style.display = 'none';
+          console.log('✅ Logo preview ocultado');
+        }
         
         // 5. Actualizar resúmenes
-        updateSummary();
-        updateSummaryPhotos();
+        console.log('Actualizando resúmenes...');
+        if (typeof updateSummary === 'function') {
+          updateSummary();
+          console.log('✅ updateSummary ejecutado');
+        }
+        
+        if (typeof updateSummaryPhotos === 'function') {
+          updateSummaryPhotos();
+          console.log('✅ updateSummaryPhotos ejecutado');
+        }
         
         // 6. Volver a primera pestaña
         const firstTab = document.querySelector('.nav-tab[data-tab="ingredients"]');
-        if (firstTab) firstTab.click();
+        if (firstTab) {
+          firstTab.click();
+          console.log('✅ Vuelto a primera pestaña');
+        }
         
+        console.log('🎉 Borrado completo exitoso');
         showToast('✅ Todos los datos han sido borrados. Aplicación lista para empezar de nuevo', 'success');
         
       } catch (error) {
